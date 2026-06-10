@@ -16,4 +16,6 @@ def hombres_escuela():
     for escuela in escuelas[1:]:
         nenes += int(escuela[26])
     return nenes
-print(hombres_escuela())
+print(hombres_escuela()) 
+
+
