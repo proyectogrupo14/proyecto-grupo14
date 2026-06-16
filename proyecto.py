@@ -70,17 +70,26 @@ with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuela
                  matricula_varones[0]:matricula_varones[1:],
                  matricula_mujeres[0]:matricula_mujeres[1:],
                  turnos[0]:turnos[1:]}
+    
+def cantidad_valores(clave:str)->int:
+    "Toma una clave del diccionario y evalua cuántos elementos posee la lista que representa su valor."
+    tamaño = 0
+    for i in diccionario[clave]:
+        tamaño+=1
+    return tamaño
 
-def tipos_niveles():
-    tipos_niveles=[]
-    for i in diccionario["nivel"]:
-        if i not in tipos_niveles:
-            tipos_niveles.append(i)
-    return tipos_niveles
+print(cantidad_valores("nivel"))
 
-print(tipos_niveles())
+def tipos_valores(clave:str) -> list:
+    tipos_valores=[]
+    for i in diccionario[clave]:
+        if i not in tipos_valores:
+            tipos_valores.append(i)
+    return tipos_valores
 
-def niveles(nivel: str) -> list:
+print(tipos_valores("modalidad"))
+
+def niveles(nivel: str, modalidad:str) -> list:
     """  Filtra y devuelve una lista con todas las escuelas que pertenecen 
     al nivel educativo dado.
 
@@ -90,24 +99,28 @@ def niveles(nivel: str) -> list:
     """
     list_nivel = []
 
-    for escuela in diccionario["establecimiento_nombre"]:
-        if diccionario["nivel"] == nivel:
-            list_nivel.append(escuela)
+    for i in range (0,cantidad_valores("nivel")):
+        if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
+            list_nivel.append(diccionario["establecimiento_nombre"][i])
     return list_nivel
 
-def suma(lista: list, sexo: int) -> int:
-    """ Calcula el total de alumnos de un sexo específico 
-    sumando los datos de la lista de escuelas.
+#print(niveles('Nivel Secundario'))
 
-    suma([['Escuela     ]], ) = 10
-    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
-    suma([], ) = 0
-    """
-    total = 0
+#def suma(lista: list, sexo: int) -> int:
+#    """ Calcula el total de alumnos de un sexo específico 
+#    sumando los datos de la lista de escuelas.
 
-    for escuela in lista:
-        total = total + int(escuela[sexo])
-    return total
+#    suma([['Escuela     ]], ) = 10
+#    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
+#    suma([], ) = 0
+#    """
+#    total = 0
+
+#    for escuela in lista:
+#        total = total + int(escuela[sexo])
+#    return total
+
+
 
 def cantidad(nivel: str, sexo: int) -> int:
     """  Calcula la cantidad total de alumnos de un sexo determinado en un 
@@ -116,19 +129,20 @@ cantidad("Inicial",             ) =
 cantidad("Primario",       ) = 
 cantidad("Secundario",  ) = 
     """
-    return suma(niveles(nivel), sexo) 
+    for i in tipos_niveles():
+        return suma(niveles(i), sexo) 
 
-VARONES = 26
-MUJERES = 27
+VARONES = diccionario["matricula_varones"]
+MUJERES = diccionario["matricula_mujeres"]
 
-#print("Varones primaria:", cantidad("Nivel Primario", VARONES))
-#print("Mujeres primaria:", cantidad("Nivel Primario", MUJERES))
+print("Varones primaria:", cantidad("Nivel Primario", VARONES))
+print("Mujeres primaria:", cantidad("Nivel Primario", MUJERES))
 
-#print("Varones secundaria:", cantidad("Nivel Secundario", VARONES))
-#print("Mujeres secundaria:", cantidad("Nivel Secundario", MUJERES))
+print("Varones secundaria:", cantidad("Nivel Secundario", VARONES))
+print("Mujeres secundaria:", cantidad("Nivel Secundario", MUJERES))
 
-#print("Varones inicial:", cantidad("Nivel Inicial", VARONES))
-#print("Mujeres inicial:", cantidad("Nivel Inicial", MUJERES))
+print("Varones inicial:", cantidad("Nivel Inicial", VARONES))
+print("Mujeres inicial:", cantidad("Nivel Inicial", MUJERES))
 
 
 
