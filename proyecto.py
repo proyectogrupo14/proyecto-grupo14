@@ -19,6 +19,7 @@ st.write("Empecemos a trabajar equipo!")'''
 def estructura_datos():
     with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
+
         municipio_id=[]
         municipio_nombre=[]
         establecimiento_id=[]
@@ -32,26 +33,26 @@ def estructura_datos():
         tipo_organizacion=[]
         ambito=[]
         matricula=[]
-        matricula_varones=[]
-        matricula_mujeres=[]
+        varones=[]
+        mujeres=[]
         turnos=[]
-   
+
         for escuela in escuelas_ba:
             municipio_id.append(escuela[0])	
             municipio_nombre.append(escuela[1])
             establecimiento_id.append(escuela[2])
             establecimiento_nombre.append(escuela[3])
-            modalidad.append(escuela[8])
-            nivel.append(escuela[9])
-            direccion.append(escuela[10])
-            telefono.append(escuela[11])
+            modalidad.append(escuela[7])
+            nivel.append(escuela[8])
+            direccion.append(escuela[9])
+            telefono.append(escuela[10])
             email.append(escuela[12])
             sector.append(escuela[13])
             tipo_organizacion.append(escuela[15])
             ambito.append(escuela[17])
             matricula.append(escuela[25])
-            matricula_varones.append(escuela[26])
-            matricula_mujeres.append(escuela[27])
+            varones.append(escuela[26])
+            mujeres.append(escuela[27])
             turnos.append(escuela[29])
         
         diccionario ={municipio_id[0]:municipio_id[1:],
@@ -67,13 +68,13 @@ def estructura_datos():
                         tipo_organizacion[0]:tipo_organizacion[1:],
                         ambito[0]:ambito[1:],
                         matricula[0]:matricula[1:],
-                        matricula_varones[0]:matricula_varones[1:],
-                        matricula_mujeres[0]:matricula_mujeres[1:],
+                        varones[0]:varones[1:],
+                        mujeres[0]:mujeres[1:],
                         turnos[0]:turnos[1:]}
     
     return diccionario
 
-#print(estructura_datos())
+#print(estructura_datos().keys())
     
 def cantidad_valores(clave:str)->int:
     "Toma una clave del diccionario y evalua cuántos elementos posee la lista que representa su valor."
@@ -84,10 +85,9 @@ def cantidad_valores(clave:str)->int:
         tamaño+=1
     return tamaño
 
-print(cantidad_valores("modalidad"))
+#print(cantidad_valores("modalidad"))
 
 def tipos_valores(clave:str) -> list:
-
     diccionario=estructura_datos()
     tipos_valores=[]
     for i in diccionario[clave]:
@@ -95,62 +95,64 @@ def tipos_valores(clave:str) -> list:
             tipos_valores.append(i)
     return tipos_valores
 
-print(tipos_valores("modalidad"))
+#print(tipos_valores("modalidad"))
 
-def niveles(nivel: str, modalidad:str) -> list:
-    """  Filtra y devuelve una lista con todas las escuelas que pertenecen 
-    al nivel educativo dado.
+
+def niveles_modalidad(nivel: str, modalidad:str) -> list:
+    """  Filtra y devuelve una lista con el nombre de los establecimientos que pertencen al nivel y modalidad introducidos.
 
     niveles("Primario") = 
     niveles("Secundario") = 
     niveles("Inicial") = Hoja de cálculo sin título - 
     """
+    diccionario=estructura_datos()
     list_nivel = []
 
     for i in range (0,cantidad_valores("nivel")):
         if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
-            list_nivel.append(diccionario["establecimiento_nombre"][i])
+ #            list_nivel.append(diccionario["establecimiento_nombre"][i])
+            list_nivel.append(i)
     return list_nivel
 
-#print(niveles('Nivel Secundario'))
+#print(niveles_modalidad('Nivel Secundario',"Educación Común"))
 
-#def suma(lista: list, sexo: int) -> int:
-#    """ Calcula el total de alumnos de un sexo específico 
-#    sumando los datos de la lista de escuelas.
+def suma_matricula_sexo(ind_establecimiento: list, sexo: str) -> int:
+   """ Calcula el total de alumnos de un sexo específico de una lista de establecimientos".
 
-#    suma([['Escuela     ]], ) = 10
-#    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
-#    suma([], ) = 0
-#    """
-#    total = 0
+    suma([['Escuela     ]], ) = 10
+    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
+    suma([], ) = 0
+   """
+   diccionario=estructura_datos()
+   suma=0
+   for i in ind_establecimiento:
+        if diccionario[sexo][i] != "":
+            suma=suma+int(diccionario[sexo][i])
+   return suma
 
-#    for escuela in lista:
-#        total = total + int(escuela[sexo])
-#    return total
+#print(suma_matricula_sexo(niveles_modalidad('Nivel Secundario',"Educación Común"),"varones"))
 
 
+#¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario de la provincia de Buenos Aires,
+#separadas por modalidad de la escuela?
 
-def cantidad(nivel: str, sexo: int) -> int:
-    """  Calcula la cantidad total de alumnos de un sexo determinado en un 
-    nivel educativo específico.
-cantidad("Inicial",             ) = 
-cantidad("Primario",       ) = 
-cantidad("Secundario",  ) = 
-    """
-    for i in tipos_niveles():
-        return suma(niveles(i), sexo) 
+def grafico():
+    for k in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
+        for j in ["varones","mujeres"]:
+            for i in tipos_valores("modalidad"):
+                if suma_matricula_sexo(niveles_modalidad(k,i),j) != 0:
+                    print(j, k, i, suma_matricula_sexo(niveles_modalidad(k,i),j))
 
-VARONES = diccionario["matricula_varones"]
-MUJERES = diccionario["matricula_mujeres"]
+grafico()
 
-print("Varones primaria:", cantidad("Nivel Primario", VARONES))
-print("Mujeres primaria:", cantidad("Nivel Primario", MUJERES))
+#print("Varones primaria:", suma_matricula_sexo("Nivel Primario", VARONES))
+#print("Mujeres primaria:", cantidad("Nivel Primario", MUJERES))
 
-print("Varones secundaria:", cantidad("Nivel Secundario", VARONES))
-print("Mujeres secundaria:", cantidad("Nivel Secundario", MUJERES))
+#print("Varones secundaria:", cantidad("Nivel Secundario", VARONES))
+#print("Mujeres secundaria:", cantidad("Nivel Secundario", MUJERES))
 
-print("Varones inicial:", cantidad("Nivel Inicial", VARONES))
-print("Mujeres inicial:", cantidad("Nivel Inicial", MUJERES))
+#print("Varones inicial:", cantidad("Nivel Inicial", VARONES))
+#print("Mujeres inicial:", cantidad("Nivel Inicial", MUJERES))
 
 
 
