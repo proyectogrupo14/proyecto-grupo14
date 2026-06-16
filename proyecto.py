@@ -16,7 +16,7 @@ st.write("Empecemos a trabajar equipo!")'''
 #   for escuela in lector:
 #      escuelas.append(escuela)
 
-with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
+with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
     escuelas_ba = csv.reader(escuelas_ba)
 
     municipio_id=[]
@@ -70,10 +70,15 @@ with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_b
                  matricula_varones[0]:matricula_varones[1:],
                  matricula_mujeres[0]:matricula_mujeres[1:],
                  turnos[0]:turnos[1:]}
-    
-    print(diccionario)
 
- 
+def tipos_niveles():
+    tipos_niveles=[]
+    for i in diccionario["nivel"]:
+        if i not in tipos_niveles:
+            tipos_niveles.append(i)
+    return tipos_niveles
+
+print(tipos_niveles())
 
 def niveles(nivel: str) -> list:
     """  Filtra y devuelve una lista con todas las escuelas que pertenecen 
@@ -81,12 +86,12 @@ def niveles(nivel: str) -> list:
 
     niveles("Primario") = 
     niveles("Secundario") = 
-    niveles("Inicial") = 
+    niveles("Inicial") = Hoja de cálculo sin título - 
     """
     list_nivel = []
 
-    for escuela in escuelas:
-        if escuela[8] == nivel:
+    for escuela in diccionario["establecimiento_nombre"]:
+        if diccionario["nivel"] == nivel:
             list_nivel.append(escuela)
     return list_nivel
 
