@@ -80,12 +80,9 @@ def cantidad_valores(clave:str)->int:
     "Toma una clave del diccionario y evalua cuántos elementos posee la lista que representa su valor."
 
     diccionario=estructura_datos()
-    tamaño = 0
-    for i in diccionario[clave]:
-        tamaño+=1
-    return tamaño
+    return len(diccionario[clave])
 
-#print(cantidad_valores("modalidad"))
+print(cantidad_valores("modalidad"))
 
 def tipos_valores(clave:str) -> list:
     diccionario=estructura_datos()
