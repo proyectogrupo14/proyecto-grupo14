@@ -54,25 +54,24 @@ with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_b
         matricula_mujeres.append(escuela[27])
         turnos.append(escuela[29])
         
-    diccionario={municipio_id[0]:municipio_id,
-                 municipio_nombre[0]:municipio_nombre,
-                 establecimiento_id[0]:establecimiento_id,
-                 establecimiento_nombre[0]:establecimiento_nombre,
-                 modalidad[0]:modalidad,
-                 nivel[0]:nivel,
-                 direccion[0]:direccion,
-                 telefono[0]:telefono,
-                 email[0]:email,
-                 sector[0]:sector,
-                 tipo_organizacion[0]:tipo_organizacion,
-                 ambito[0]:ambito,
-                 matricula[0]:matricula,
-                 matricula_varones[0]:matricula_varones,
-                 matricula_mujeres[0]:matricula_mujeres,
-                 turnos[0]:turnos}
+    diccionario={municipio_id[0]:municipio_id[1:],
+                 municipio_nombre[0]:municipio_nombre[1:],
+                 establecimiento_id[0]:establecimiento_id[1:],
+                 establecimiento_nombre[0]:establecimiento_nombre[1:],
+                 modalidad[0]:modalidad[1:],
+                 nivel[0]:nivel[1:],
+                 direccion[0]:direccion[1:],
+                 telefono[0]:telefono[1:],
+                 email[0]:email[1:],
+                 sector[0]:sector[1:],
+                 tipo_organizacion[0]:tipo_organizacion[1:],
+                 ambito[0]:ambito[1:],
+                 matricula[0]:matricula[1:],
+                 matricula_varones[0]:matricula_varones[1:],
+                 matricula_mujeres[0]:matricula_mujeres[1:],
+                 turnos[0]:turnos[1:]}
+    
     print(diccionario)
- 
-
 
  
 
