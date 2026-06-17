@@ -139,7 +139,7 @@ def grafico(diccionario):
     for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
         
         for modalidad in tipos_valores(diccionario, "modalidad"):
-            niveles.append(f"{nivel}/n{modalidad}")
+            niveles.append(f"{nivel}\n{modalidad}")
 
             indices = niveles_modalidad(diccionario, nivel, modalidad)
 
@@ -149,10 +149,16 @@ def grafico(diccionario):
             sexo["Mujeres"].append(cantidad_mujeres)
             sexo["Varones"].append(cantidad_varones)
 #PARTE DEL MATPLOT
-    fig, ax = plt.subplots(layout='constrained')
+    fig, ax = plt.subplots(figsize=(18, 10), layout="constrained")
+    ax.set_xticklabels(niveles, rotation=45)
     res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1)
     for container in res.bar_containers:
         ax.bar_label(container, padding=3)
+
+    #ax.set_ylabel('Cantidad de Estudiantes')
+    #ax.set_title("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario,de la provincia de Buenos Aires, separadas por modalidad de la escuela?")
+    #ax.legend(loc='upper left', ncols=2)
+    #ax.set_ylim(0, 250)
 
     st.pyplot(fig)
             
@@ -162,4 +168,4 @@ def main():
     diccionario = estructura_datos()
     grafico(diccionario)
 
-main()
+main() 
