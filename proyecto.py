@@ -76,51 +76,47 @@ def estructura_datos():
 
 #print(estructura_datos().keys())
     
-def cantidad_valores(clave:str)->int:
-    "Toma una clave del diccionario y evalua cuántos elementos posee la lista que representa su valor."
+def cantidad_valores(diccionario:dict, clave:str)->int:
+    '''Toma una clave del diccionario y evalua cuántos elementos posee la lista que 
+    representa su valor.'''
 
-    diccionario=estructura_datos()
     return len(diccionario[clave])
 
-print(cantidad_valores("modalidad"))
 
-def tipos_valores(clave:str) -> list:
-    diccionario=estructura_datos()
+def tipos_valores(diccionario:dict, clave:str) -> list:
+
     tipos_valores=[]
+
     for i in diccionario[clave]:
         if i not in tipos_valores:
             tipos_valores.append(i)
     return tipos_valores
 
-#print(tipos_valores("modalidad"))
 
 
-def niveles_modalidad(nivel: str, modalidad:str) -> list:
+def niveles_modalidad(diccionario:dict, nivel: str, modalidad:str) -> list:
     """  Filtra y devuelve una lista con el nombre de los establecimientos que pertencen al nivel y modalidad introducidos.
 
     niveles("Primario") = 
     niveles("Secundario") = 
     niveles("Inicial") = Hoja de cálculo sin título - 
     """
-    diccionario=estructura_datos()
     list_nivel = []
 
-    for i in range (0,cantidad_valores("nivel")):
+    for i in range (0,cantidad_valores(diccionario, "nivel")):
         if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
- #            list_nivel.append(diccionario["establecimiento_nombre"][i])
             list_nivel.append(i)
     return list_nivel
 
-#print(niveles_modalidad('Nivel Secundario',"Educación Común"))
 
-def suma_matricula_sexo(ind_establecimiento: list, sexo: str) -> int:
+def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) -> int:
    """ Calcula el total de alumnos de un sexo específico de una lista de establecimientos".
 
     suma([['Escuela     ]], ) = 10
     suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
     suma([], ) = 0
    """
-   diccionario=estructura_datos()
+   
    suma=0
    for i in ind_establecimiento:
         if diccionario[sexo][i] != "":
@@ -133,23 +129,37 @@ def suma_matricula_sexo(ind_establecimiento: list, sexo: str) -> int:
 #¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario de la provincia de Buenos Aires,
 #separadas por modalidad de la escuela?
 
-def grafico():
-    for k in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
-        for j in ["varones","mujeres"]:
-            for i in tipos_valores("modalidad"):
-                if suma_matricula_sexo(niveles_modalidad(k,i),j) != 0:
-                    print(j, k, i, suma_matricula_sexo(niveles_modalidad(k,i),j))
+def grafico(diccionario):
+    niveles = []
+    sexo = {
+        "Varones":[],
+        "Mujeres":[]
+    }
 
-grafico()
+    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
+        
+        for modalidad in tipos_valores(diccionario, "modalidad"):
+            niveles.append(f"{nivel}/n{modalidad}")
 
-#print("Varones primaria:", suma_matricula_sexo("Nivel Primario", VARONES))
-#print("Mujeres primaria:", cantidad("Nivel Primario", MUJERES))
+            indices = niveles_modalidad(diccionario, nivel, modalidad)
 
-#print("Varones secundaria:", cantidad("Nivel Secundario", VARONES))
-#print("Mujeres secundaria:", cantidad("Nivel Secundario", MUJERES))
+            cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
+            cantidad_mujeres = suma_matricula_sexo(diccionario, indices, "mujeres")
 
-#print("Varones inicial:", cantidad("Nivel Inicial", VARONES))
-#print("Mujeres inicial:", cantidad("Nivel Inicial", MUJERES))
+            sexo["Mujeres"].append(cantidad_mujeres)
+            sexo["Varones"].append(cantidad_varones)
+#PARTE DEL MATPLOT
+    fig, ax = plt.subplots(layout='constrained')
+    res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1)
+    for container in res.bar_containers:
+        ax.bar_label(container, padding=3)
+
+    st.pyplot(fig)
+            
 
 
+def main():
+    diccionario = estructura_datos()
+    grafico(diccionario)
 
+main()
