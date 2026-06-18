@@ -72,7 +72,7 @@ def estructura_datos():
     
     return diccionario
 
-print(estructura_datos())
+#print(estructura_datos())
     
 def cantidad_valores(diccionario:dict, clave:str)->int:
     '''Toma una clave del diccionario y evalua cuántos elementos posee la lista que 
@@ -166,16 +166,20 @@ def conversion_str_float(clave,diccionario):
         list_float.append(float(x))
     return list_float
 
-  
+def buscador_indices(diccionario,clave,dato):
+    for i in range (0,cantidad_valores(diccionario,clave)):
+        if dato == diccionario[clave][i]:
+            return i
+
 
 #MAPA
-def mapa(diccionario):
-    st.map(data={"lat": conversion_str_float("latitud",diccionario),"lon": conversion_str_float("longitud",diccionario)}, latitude=None, longitude=None, 
+def mapa(diccionario,credencial):
+    i=x_escuela(diccionario, credencial)["latitud"]
+    j=x_escuela(diccionario, credencial)["longitud"]
+    st.map(data={"lat": [float(i)], "lon": [float(j)]}, latitude=None, longitude=None, 
            color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
             
 def x_escuela(diccionario: dict, credencial: str) -> dict:
-
-    
     for i in range(cantidad_valores(diccionario, "establecimiento_id")):
         if diccionario["establecimiento_id"][i] == credencial:
             return {
@@ -186,14 +190,26 @@ def x_escuela(diccionario: dict, credencial: str) -> dict:
                 "municipio": diccionario["municipio_nombre"][i],
                 "correo": diccionario["email"][i],
                 "telefono": diccionario["telefono"][i],
-                "sector": diccionario["sector"][i]
+                "sector": diccionario["sector"][i],
+                "latitud": diccionario["latitud"][i],
+               "longitud": diccionario["longitud"][i]
             }
 
     return {}
 
 
+def tabla(diccionario: dict, credencial: str):
+    st.table(data=x_escuela(diccionario,credencial), border=True, width="stretch", height="content", hide_index=None, hide_header=None)
+
+
 def main():
     diccionario = estructura_datos()
+    credencial="24087"
+    #input("Ingrese credencial del establecimiento: ")
     grafico(diccionario)
+    mapa(diccionario,credencial)
+    tabla(diccionario, credencial)
+    print(float(x_escuela(diccionario, credencial)["latitud"]))
+   
 
 main() 
