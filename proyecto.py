@@ -173,16 +173,19 @@ def buscador_indices(diccionario,clave,dato):
 
 
 #MAPA
-def mapa(diccionario,credencial):
-    i=x_escuela(diccionario, credencial)["latitud"]
-    j=x_escuela(diccionario, credencial)["longitud"]
-    st.map(data={"lat": [float(i)], "lon": [float(j)]}, latitude=None, longitude=None, 
+def mapa(diccionario,credencial=""):
+    if credencial != "":
+        i=x_escuela(diccionario, credencial)["latitud"]
+        j=x_escuela(diccionario, credencial)["longitud"]
+        st.map(data={"lat": [float(i)], "lon": [float(j)]}, latitude=None, longitude=None, 
            color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
+    return None
             
-def x_escuela(diccionario: dict, credencial: str) -> dict:
-    for i in range(cantidad_valores(diccionario, "establecimiento_id")):
-        if diccionario["establecimiento_id"][i] == credencial:
-            return {
+def x_escuela(diccionario: dict, credencial="" ) -> dict:
+    if credencial != "":
+        for i in range(cantidad_valores(diccionario, "establecimiento_id")):
+            if diccionario["establecimiento_id"][i] == credencial:
+                return {
                 "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
                 "nivel": diccionario["nivel"][i],
                 "modalidad": diccionario["modalidad"][i],
@@ -194,22 +197,33 @@ def x_escuela(diccionario: dict, credencial: str) -> dict:
                 "latitud": diccionario["latitud"][i],
                "longitud": diccionario["longitud"][i]
             }
+        return {}
+    return None
 
-    return {}
+
+def tabla(diccionario: dict, credencial=""):
+    if credencial != "":
+        return st.table(data=x_escuela(diccionario,credencial), border=True, width="stretch", height="content", 
+                        hide_index=None, hide_header=None)
+    return None
 
 
-def tabla(diccionario: dict, credencial: str):
-    st.table(data=x_escuela(diccionario,credencial), border=True, width="stretch", height="content", hide_index=None, hide_header=None)
 
+def ingreso_establecimiento_id(diccionario):
+    return st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
+                    on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
+                    label_visibility="visible", icon=None, width="stretch", bind=None)
+    
+
+    
 
 def main():
     diccionario = estructura_datos()
-    credencial="24087"
-    #input("Ingrese credencial del establecimiento: ")
+    credencial=ingreso_establecimiento_id(diccionario)
     grafico(diccionario)
     mapa(diccionario,credencial)
     tabla(diccionario, credencial)
-    print(float(x_escuela(diccionario, credencial)["latitud"]))
-   
+  #  print(float(x_escuela(diccionario, credencial)["latitud"]))
+
 
 main() 
