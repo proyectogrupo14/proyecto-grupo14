@@ -173,11 +173,27 @@ def mapa(diccionario):
     st.map(data={"lat": conversion_str_float("latitud",diccionario),"lon": conversion_str_float("longitud",diccionario)}, latitude=None, longitude=None, 
            color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
             
+def x_escuela(diccionario: dict, credencial: str) -> dict:
+
+    
+    for i in range(cantidad_valores(diccionario, "establecimiento_id")):
+        if diccionario["establecimiento_id"][i] == credencial:
+            return {
+                "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
+                "nivel": diccionario["nivel"][i],
+                "modalidad": diccionario["modalidad"][i],
+                "direccion": diccionario["direccion"][i],
+                "municipio": diccionario["municipio_nombre"][i],
+                "correo": diccionario["email"][i],
+                "telefono": diccionario["telefono"][i],
+                "sector": diccionario["sector"][i]
+            }
+
+    return {}
 
 
 def main():
     diccionario = estructura_datos()
     grafico(diccionario)
-    mapa(diccionario)
 
 main() 
