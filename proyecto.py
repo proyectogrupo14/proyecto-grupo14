@@ -162,10 +162,30 @@ def grafico(diccionario):
 
     st.pyplot(fig)
             
+def x_escuela(diccionario: dict, credencial: str) -> dict:
+
+    
+    for i in range(cantidad_valores(diccionario, "establecimiento_id")):
+        if diccionario["establecimiento_id"][i] == credencial:
+            return {
+                "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
+                "nivel": diccionario["nivel"][i],
+                "modalidad": diccionario["modalidad"][i],
+                "direccion": diccionario["direccion"][i],
+                "municipio": diccionario["municipio_nombre"][i],
+                "correo": diccionario["email"][i],
+                "telefono": diccionario["telefono"][i],
+                "sector": diccionario["sector"][i]
+            }
+
+    return {}
 
 
 def main():
     diccionario = estructura_datos()
     grafico(diccionario)
+    credencial = input("ingrese credencial:" )
+    escuela = x_escuela(diccionario, credencial)
+    print(escuela)
 
 main() 
