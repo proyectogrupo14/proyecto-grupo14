@@ -4,8 +4,8 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 
-#'''st.title("Proyecto Grupal de programacion")
-#st.write("Empecemos a trabajar equipo!")'''
+st.title("Escuelas de la Provincia de Buenos Aires")
+st.write("grafico de cantidad de niños por nivel")
 
 
 def estructura_datos():
@@ -219,8 +219,8 @@ def ingreso_establecimiento_id(diccionario):
 
 def main():
     diccionario = estructura_datos()
-    credencial=ingreso_establecimiento_id(diccionario)
     grafico(diccionario)
+    credencial=ingreso_establecimiento_id(diccionario)
     mapa(diccionario,credencial)
     tabla(diccionario, credencial)
   #  print(float(x_escuela(diccionario, credencial)["latitud"]))
