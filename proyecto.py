@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 #python -m streamlit run proyecto.py
 
 
-st.set_page_config(layout="wide")
-st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
-
-def estructura_datos():
-    with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
+def estructura_datos()->dict:
+  #  "Toma el archivo .csv, lee las filas, arma listas en base a las columnas y devuelve un diccionario donde"
+  #  "la clave son str de los titulos provistos en la fila 0 del archivo.csv y el valor es una lista con los demás"
+  #  "valores de la columna."
+    with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
 
         municipio_id=[]
@@ -85,9 +85,9 @@ def cantidad_valores(diccionario:dict, clave:str)->int:
 
 
 def tipos_valores(diccionario:dict, clave:str) -> list:
-
+#Toma una clave del diccionario y genera una lista con los diferentes tipos de elementos posee la lista que 
+#representa su valor.
     tipos_valores=[]
-
     for i in diccionario[clave]:
         if i not in tipos_valores:
             tipos_valores.append(i)
@@ -103,7 +103,6 @@ def niveles_modalidad(diccionario:dict, nivel: str, modalidad:str) -> list:
     niveles("Inicial") = Hoja de cálculo sin título - 
     """
     list_nivel = []
-
     for i in range (0,cantidad_valores(diccionario, "nivel")):
         if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
             list_nivel.append(i)
@@ -124,13 +123,9 @@ def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) 
             suma=suma+int(diccionario[sexo][i])
    return suma
 
-#print(suma_matricula_sexo(niveles_modalidad('Nivel Secundario',"Educación Común"),"varones"))
-
-
-#¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario de la provincia de Buenos Aires,
-#separadas por modalidad de la escuela?
-
-def grafico(diccionario):
+def grafico(diccionario:dict):
+    #Toma la estructura de datos e imprime un gráfico de barras dónde se muestra la cantidad de estudiantes varones
+    #y mujeres que asisten a un establecimiento educativo del mismo nivel y misma modalidad en la provincia de Bs As.
     niveles = []
     sexo = {"Varones":[],"Mujeres":[]}
     for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]: 
@@ -151,31 +146,35 @@ def grafico(diccionario):
                     sexo["Mujeres"].pop(i)
 #PARTE DEL MATPLOT
     fig, ax = plt.subplots(figsize=(18, 10), layout="constrained")
-    ax.set_xticklabels(niveles, rotation=45,fontsize=20)
+    ax.set_xticklabels(niveles, rotation=90,fontsize=15)
     res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1,colors=["navy","skyblue"])
     for container in res.bar_containers:
-        ax.bar_label(container, padding=3,fontsize=20)
+        ax.bar_label(container, padding=3,fontsize=15)
 
     ax.set_ylabel('Cantidad de Estudiantes',fontsize=20)
     ax.legend(loc='upper left', ncols=2,fontsize=20)
-    ax.set_ylim(0, 1250)
+    ax.set_ylim(0, 500000)
 
     st.pyplot(fig)
 
-def conversion_str_float(clave,diccionario):
-    list_float=[]
-    for x in diccionario[clave]:
-        list_float.append(float(x))
-    return list_float
+#NO UTILIZADAs
+#def conversion_str_float(clave:str,diccionario:dict)->list:
+#   Toma una lista de str y la convierte a una lista de float.
+#    list_float=[]
+#    for x in diccionario[clave]:
+#        list_float.append(float(x))
+#    return list_float
 
-def buscador_indices(diccionario,clave,dato):
-    for i in range (0,cantidad_valores(diccionario,clave)):
-        if dato == diccionario[clave][i]:
-            return i
+#def buscador_indices(diccionario:dict,clave:str,dato:Any)->int:
+#   Toma un diccionario cuyos valores sean listas, una clave de ese diccionario y un dato que 
+#   pertenece a los valores de esa clave y devuelve el indice del lugar que ocupa en la lista.
+#    for i in range (0,cantidad_valores(diccionario,clave)):
+#        if dato == diccionario[clave][i]:
+#            return i
 
-
-#MAPA
-def mapa(diccionario,credencial=""):
+def mapa(diccionario:dict,credencial=""):
+    #Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
+    #coordenada donde se halla el establcimiento.
     if credencial != "":
         i=x_escuela(diccionario, credencial)["latitud"]
         j=x_escuela(diccionario, credencial)["longitud"]
@@ -184,6 +183,8 @@ def mapa(diccionario,credencial=""):
     return None
             
 def x_escuela(diccionario: dict, credencial="" ) -> dict:
+    #Toma un diccionario y el id del establecimiento eductivo (str) y devuelve un diccionario con los datos
+    #mas relevantes del establecimiento.
     if credencial != "":
         for i in range(cantidad_valores(diccionario, "establecimiento_id")):
             if diccionario["establecimiento_id"][i] == credencial:
@@ -204,6 +205,8 @@ def x_escuela(diccionario: dict, credencial="" ) -> dict:
 
 
 def tabla(diccionario: dict, credencial=""):
+    #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
+    #con los datos más relevantes del establecimiento.
     if credencial != "":
         return st.table(data=x_escuela(diccionario,credencial), border=True, width="stretch", height="content", 
                         hide_index=None, hide_header=None)
@@ -211,7 +214,9 @@ def tabla(diccionario: dict, credencial=""):
 
 
 
-def ingreso_establecimiento_id(diccionario):
+def ingreso_establecimiento_id(diccionario:dict)-> str:
+    #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
+    #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
     id=st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
@@ -222,7 +227,12 @@ def ingreso_establecimiento_id(diccionario):
 
     
 
-def layout(diccionario,credencial=""):
+def layout(diccionario:dict,credencial=""):
+    #Disposición en la página, toma el diccionario y dispone que la credencial con información de un establecimiento
+    #y el mapa queden a la izq y el gráfico de barras con la cantidad de estudiantes por sexo, nivel y modalidad a la 
+    #derecha.
+    st.set_page_config(layout="wide")
+    st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
     col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
     with col1:
         st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
@@ -236,12 +246,7 @@ def layout(diccionario,credencial=""):
 
 def main():
     diccionario = estructura_datos()
- #   grafico(diccionario)
- #   credencial=ingreso_establecimiento_id(diccionario)
     layout(diccionario)
- #   mapa(diccionario,credencial)
-  #  tabla(diccionario, credencial)
-  #  print(float(x_escuela(diccionario, credencial)["latitud"]))
 
 
 main() 
