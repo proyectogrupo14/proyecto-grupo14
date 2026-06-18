@@ -3,10 +3,13 @@ import codecs
 import streamlit as st
 import matplotlib.pyplot as plt
 
+#Para ejecutar el programa: 
+#pip install streamlit
+#python -m streamlit run proyecto.py
 
-st.title("Escuelas de la Provincia de Buenos Aires")
-st.write("grafico de cantidad de niños por nivel")
 
+st.set_page_config(layout="wide")
+st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
 
 def estructura_datos():
     with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
@@ -129,16 +132,11 @@ def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) 
 
 def grafico(diccionario):
     niveles = []
-    sexo = {
-        "Varones":[],
-        "Mujeres":[]
-    }
-
-    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
-        
+    sexo = {"Varones":[],"Mujeres":[]}
+    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]: 
         for modalidad in tipos_valores(diccionario, "modalidad"):
-            niveles.append(f"{nivel}\n{modalidad}")
 
+            niveles.append(f"{nivel}\n{modalidad}")
             indices = niveles_modalidad(diccionario, nivel, modalidad)
 
             cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
@@ -146,16 +144,20 @@ def grafico(diccionario):
 
             sexo["Mujeres"].append(cantidad_mujeres)
             sexo["Varones"].append(cantidad_varones)
+            for i in range (0,len(sexo["Varones"])):
+                if sexo["Varones"][i] == 0 and sexo["Mujeres"][i] ==0:
+                    niveles.pop(i)
+                    sexo["Varones"].pop(i)
+                    sexo["Mujeres"].pop(i)
 #PARTE DEL MATPLOT
     fig, ax = plt.subplots(figsize=(18, 10), layout="constrained")
-    ax.set_xticklabels(niveles, rotation=45)
-    res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1)
+    ax.set_xticklabels(niveles, rotation=45,fontsize=20)
+    res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1,colors=["navy","skyblue"])
     for container in res.bar_containers:
-        ax.bar_label(container, padding=3)
+        ax.bar_label(container, padding=3,fontsize=20)
 
-    ax.set_ylabel('Cantidad de Estudiantes')
-    ax.set_title("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario,de la provincia de Buenos Aires, separadas por modalidad de la escuela?")
-    ax.legend(loc='upper left', ncols=2)
+    ax.set_ylabel('Cantidad de Estudiantes',fontsize=20)
+    ax.legend(loc='upper left', ncols=2,fontsize=20)
     ax.set_ylim(0, 1250)
 
     st.pyplot(fig)
@@ -210,19 +212,35 @@ def tabla(diccionario: dict, credencial=""):
 
 
 def ingreso_establecimiento_id(diccionario):
-    return st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
+    id=st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
-    
+    if id in diccionario["establecimiento_id"]:
+        return id
+    else:
+        return ""
 
     
+
+def layout(diccionario,credencial=""):
+    col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
+    with col1:
+        st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+        credencial=ingreso_establecimiento_id(diccionario)
+        tabla(diccionario, credencial)
+        mapa(diccionario,credencial)
+    with col2:
+        st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+        grafico(diccionario)
+
 
 def main():
     diccionario = estructura_datos()
-    grafico(diccionario)
-    credencial=ingreso_establecimiento_id(diccionario)
-    mapa(diccionario,credencial)
-    tabla(diccionario, credencial)
+ #   grafico(diccionario)
+ #   credencial=ingreso_establecimiento_id(diccionario)
+    layout(diccionario)
+ #   mapa(diccionario,credencial)
+  #  tabla(diccionario, credencial)
   #  print(float(x_escuela(diccionario, credencial)["latitud"]))
 
 
