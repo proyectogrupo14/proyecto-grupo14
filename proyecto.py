@@ -4,17 +4,9 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 
-'''st.title("Proyecto Grupal de programacion")
-st.write("Empecemos a trabajar equipo!")'''
+#'''st.title("Proyecto Grupal de programacion")
+#st.write("Empecemos a trabajar equipo!")'''
 
-
-#lectura del dataset
-#escuelas = []
-#with open("establecimientos-educativos-12K.csv", newline='') as escuelas_ba:
-#    lector = csv.reader(escuelas_ba)
-#
-#   for escuela in lector:
-#      escuelas.append(escuela)
 
 def estructura_datos():
     with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
@@ -36,6 +28,8 @@ def estructura_datos():
         varones=[]
         mujeres=[]
         turnos=[]
+        latitud=[]
+        longitud=[]
 
         for escuela in escuelas_ba:
             municipio_id.append(escuela[0])	
@@ -54,6 +48,8 @@ def estructura_datos():
             varones.append(escuela[26])
             mujeres.append(escuela[27])
             turnos.append(escuela[29])
+            latitud.append(escuela[33])
+            longitud.append(escuela[34])
         
         diccionario ={municipio_id[0]:municipio_id[1:],
                         municipio_nombre[0]:municipio_nombre[1:],
@@ -70,11 +66,13 @@ def estructura_datos():
                         matricula[0]:matricula[1:],
                         varones[0]:varones[1:],
                         mujeres[0]:mujeres[1:],
-                        turnos[0]:turnos[1:]}
+                        turnos[0]:turnos[1:],
+                        latitud[0]:latitud[1:],
+                        longitud[0]:longitud[1:]}
     
     return diccionario
 
-#print(estructura_datos().keys())
+print(estructura_datos())
     
 def cantidad_valores(diccionario:dict, clave:str)->int:
     '''Toma una clave del diccionario y evalua cuántos elementos posee la lista que 
@@ -155,17 +153,31 @@ def grafico(diccionario):
     for container in res.bar_containers:
         ax.bar_label(container, padding=3)
 
-    #ax.set_ylabel('Cantidad de Estudiantes')
-    #ax.set_title("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario,de la provincia de Buenos Aires, separadas por modalidad de la escuela?")
-    #ax.legend(loc='upper left', ncols=2)
-    #ax.set_ylim(0, 250)
+    ax.set_ylabel('Cantidad de Estudiantes')
+    ax.set_title("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario,de la provincia de Buenos Aires, separadas por modalidad de la escuela?")
+    ax.legend(loc='upper left', ncols=2)
+    ax.set_ylim(0, 1250)
 
     st.pyplot(fig)
+
+def conversion_str_float(clave,diccionario):
+    list_float=[]
+    for x in diccionario[clave]:
+        list_float.append(float(x))
+    return list_float
+
+  
+
+#MAPA
+def mapa(diccionario):
+    st.map(data={"lat": conversion_str_float("latitud",diccionario),"lon": conversion_str_float("longitud",diccionario)}, latitude=None, longitude=None, 
+           color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
             
 
 
 def main():
     diccionario = estructura_datos()
     grafico(diccionario)
+    mapa(diccionario)
 
 main() 
