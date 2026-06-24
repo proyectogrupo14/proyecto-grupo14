@@ -12,7 +12,7 @@ def estructura_datos()->dict:
   #  "Toma el archivo .csv, lee las filas, arma listas en base a las columnas y devuelve un diccionario donde"
   #  "la clave son str de los titulos provistos en la fila 0 del archivo.csv y el valor es una lista con los demás"
   #  "valores de la columna."
-    with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
+    with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
 
         municipio_id=[]
@@ -225,12 +225,60 @@ def ingreso_establecimiento_id(diccionario:dict)-> str:
     else:
         return ""
 
-    
+#¿Cual es el nombre, direccion y establecimiento_id de instituciones educativas que se encuentran en Y municipio
+# de la prov de BA, de X nivel?
+def ingreso_municipio_nombre(diccionario:dict)-> str:
+    #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
+    #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
+    introduccion="Establecimientos por localidad y nivel educativo: "
+    st.header(introduccion, anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
+                    on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
+                    label_visibility="visible", icon=None, width="stretch", bind=None)
+    for i in range (0,cantidad_valores(diccionario,"municipio_nombre")):
+        if municipio.lower() == diccionario["municipio_nombre"][i].lower():
+            return municipio
+    else:
+        return ""
 
-def layout(diccionario:dict,credencial=""):
-    #Disposición en la página, toma el diccionario y dispone que la credencial con información de un establecimiento
-    #y el mapa queden a la izq y el gráfico de barras con la cantidad de estudiantes por sexo, nivel y modalidad a la 
-    #derecha.
+def ingreso_nivel(diccionario:dict)->str:
+    nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=0, key=None, help=None, on_change=None,
+     args=None, kwargs=None, disabled=False, horizontal=False, captions=None, label_visibility="visible", 
+     width="content", bind=None)
+    return nivel
+    
+def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->list:
+    indices=[]
+    for j in range (0,cantidad_valores(diccionario, "municipio_nombre")):
+        if municipio.lower() == diccionario["municipio_nombre"][j].lower() and nivel == diccionario["nivel"][j]:
+            indices.append(j)
+    return indices
+   
+def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict:
+    indices=indices_tabla_establecimientos(diccionario,municipio,nivel)
+    establecimiento_nombre=[]
+    direccion=[]
+    email=[]
+    for j in indices:
+        establecimiento_nombre.append(diccionario["establecimiento_nombre"][j])
+        direccion.append(diccionario["direccion"][j])
+        email.append(diccionario["email"][j])
+    datos_tabla={"Nombre del Establecimiento":establecimiento_nombre,"Dirección":direccion,"E-mail":email}
+    return datos_tabla
+
+def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
+    datos_tabla=datos_tabla_establecimientos(diccionario, municipio, nivel)
+    if len(datos_tabla["Nombre del Establecimiento"]) > 0:
+        tabla=st.table(data=datos_tabla, border=True, width="stretch", height="content",
+         hide_index=None, hide_header=None)
+        return tabla
+    else: 
+        texto="No existen establecimientos de tal nivel en la localidad ingresada."
+        st.markdown(texto, unsafe_allow_html=False, help=None, width="auto", text_alignment="left")
+
+
+def main():
+    diccionario = estructura_datos()
     st.set_page_config(layout="wide")
     st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
     col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
@@ -239,14 +287,14 @@ def layout(diccionario:dict,credencial=""):
         credencial=ingreso_establecimiento_id(diccionario)
         tabla(diccionario, credencial)
         mapa(diccionario,credencial)
+        municipio=ingreso_municipio_nombre(diccionario)
+        nivel=ingreso_nivel(diccionario)
+        if municipio!="" and nivel!="":
+            tabla_establecimientos(diccionario,municipio,nivel)  
     with col2:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
-
-
-def main():
-    diccionario = estructura_datos()
-    layout(diccionario)
+        
 
 
 main() 
