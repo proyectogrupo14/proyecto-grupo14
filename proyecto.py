@@ -123,27 +123,34 @@ def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) 
             suma=suma+int(diccionario[sexo][i])
    return suma
 
-def grafico(diccionario:dict):
-    #Toma la estructura de datos e imprime un gráfico de barras dónde se muestra la cantidad de estudiantes varones
-    #y mujeres que asisten a un establecimiento educativo del mismo nivel y misma modalidad en la provincia de Bs As.
+
+
+def agregar_datos(diccionario: dict, nivel: str, modalidad: str,niveles: list, sexo: dict):
+    '''esta funcion agrega los niveles donde los chicos (varones y nenas) son distinto de 0, a la lista niveles
+    donde se guardan los nombres que aparecen en el eje x...por otra parte calcula los chicos y chicas por nivel y modalidad
+     para guardar en el diccionario sexo que despues se usa en el grafico '''
+
+    indices = niveles_modalidad(diccionario, nivel, modalidad)
+
+    cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
+    cantidad_mujeres = suma_matricula_sexo(diccionario, indices, "mujeres")
+
+    if cantidad_varones != 0 or cantidad_mujeres != 0:
+        niveles.append(f"{nivel}\n{modalidad}")
+        sexo["Varones"].append(cantidad_varones)
+        sexo["Mujeres"].append(cantidad_mujeres)
+
+def grafico(diccionario: dict):
+    '''esta funcion toma el diccionario general y utilizando la funcion anterior, toma valores
+    necesarios para hacer el grafico'''
     niveles = []
-    sexo = {"Varones":[],"Mujeres":[]}
-    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]: 
+    sexo = {"Varones": [], "Mujeres": []}
+
+    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
         for modalidad in tipos_valores(diccionario, "modalidad"):
+            agregar_datos(diccionario, nivel, modalidad, niveles, sexo)
 
-            niveles.append(f"{nivel}\n{modalidad}")
-            indices = niveles_modalidad(diccionario, nivel, modalidad)
 
-            cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
-            cantidad_mujeres = suma_matricula_sexo(diccionario, indices, "mujeres")
-
-            sexo["Mujeres"].append(cantidad_mujeres)
-            sexo["Varones"].append(cantidad_varones)
-            for i in range (0,len(sexo["Varones"])):
-                if sexo["Varones"][i] == 0 and sexo["Mujeres"][i] ==0:
-                    niveles.pop(i)
-                    sexo["Varones"].pop(i)
-                    sexo["Mujeres"].pop(i)
 #PARTE DEL MATPLOT
     fig, ax = plt.subplots(figsize=(18, 10), layout="constrained")
     ax.set_xticklabels(niveles, rotation=90,fontsize=15)
