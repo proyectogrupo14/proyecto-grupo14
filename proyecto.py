@@ -179,48 +179,6 @@ def grafico(diccionario: dict):
 #        if dato == diccionario[clave][i]:
 #            return i
 
-def mapa(diccionario:dict,credencial=""):
-    #Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
-    #coordenada donde se halla el establcimiento.
-    if credencial != "":
-        i=x_escuela(diccionario, credencial)["latitud"]
-        j=x_escuela(diccionario, credencial)["longitud"]
-        st.map(data={"lat": [float(i)], "lon": [float(j)]}, latitude=None, longitude=None, 
-           color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
-    return None
-            
-def x_escuela(diccionario: dict, credencial="" ) -> dict:
-    #Toma un diccionario y el id del establecimiento eductivo (str) y devuelve un diccionario con los datos
-    #mas relevantes del establecimiento.
-    if credencial != "":
-        for i in range(cantidad_valores(diccionario, "establecimiento_id")):
-            if diccionario["establecimiento_id"][i] == credencial:
-                return {
-                "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
-                "nivel": diccionario["nivel"][i],
-                "modalidad": diccionario["modalidad"][i],
-                "direccion": diccionario["direccion"][i],
-                "municipio": diccionario["municipio_nombre"][i],
-                "correo": diccionario["email"][i],
-                "telefono": diccionario["telefono"][i],
-                "sector": diccionario["sector"][i],
-                "latitud": diccionario["latitud"][i],
-               "longitud": diccionario["longitud"][i]
-            }
-        return {}
-    return None
-
-
-def tabla(diccionario: dict, credencial=""):
-    #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
-    #con los datos más relevantes del establecimiento.
-    if credencial != "":
-        return st.table(data=x_escuela(diccionario,credencial), border=True, width="stretch", height="content", 
-                        hide_index=None, hide_header=None)
-    return None
-
-
-
 def ingreso_establecimiento_id(diccionario:dict)-> str:
     #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
     #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
@@ -231,6 +189,46 @@ def ingreso_establecimiento_id(diccionario:dict)-> str:
         return id
     else:
         return ""
+            
+def x_escuela(diccionario: dict, credencial="" ) -> dict:
+    #Toma un diccionario y el id del establecimiento eductivo (str) y devuelve un diccionario con los datos
+    #mas relevantes del establecimiento.
+    if credencial != "":
+        for i in range(cantidad_valores(diccionario, "establecimiento_id")):
+            if diccionario["establecimiento_id"][i] == credencial:
+                diccionario_tabla= {
+                "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
+                "nivel": diccionario["nivel"][i],
+                "modalidad": diccionario["modalidad"][i],
+                "direccion": diccionario["direccion"][i],
+                "municipio": diccionario["municipio_nombre"][i],
+                "correo": diccionario["email"][i],
+                "telefono": diccionario["telefono"][i],
+                "sector": diccionario["sector"][i],
+                "latitud": diccionario["latitud"][i],
+               "longitud": diccionario["longitud"][i]}
+                return diccionario_tabla
+        return {}
+    return None
+
+
+def tabla(diccionario_tabla: dict, credencial=""):
+    #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
+    #con los datos más relevantes del establecimiento.
+    if credencial != "":
+        return st.table(data=diccionario_tabla, border=True, width="stretch", height="content", 
+                        hide_index=None, hide_header=None)
+    return None
+
+def mapa(diccionario_tabla:dict,credencial=""):
+    #Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
+    #coordenada donde se halla el establcimiento.
+    if credencial != "":
+        lat=diccionario_tabla["latitud"]
+        long=diccionario_tabla["longitud"]
+        st.map(data={"lat": [float(lat)], "lon": [float(long)]}, latitude=None, longitude=None, 
+           color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
+    return None
 
 def ingreso_municipio_nombre(diccionario:dict)-> str:
     #Toma un diccionario y le pide al usuario que ingrese el nombre del municipio del cual desea obtener más 
@@ -240,11 +238,12 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
     municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
+    #corregir x while
     for i in range (0,cantidad_valores(diccionario,"municipio_nombre")):
         if municipio.lower() == diccionario["municipio_nombre"][i].lower():
             return municipio
-    else:
-        return ""
+        else:
+            return ""
 
 def ingreso_nivel(diccionario:dict)->str:
     #Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
@@ -292,6 +291,7 @@ def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
 
 
 def main():
+    #Entrada y salida de datos.
     diccionario = estructura_datos()
     st.set_page_config(layout="wide")
     st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
@@ -299,8 +299,9 @@ def main():
     with col1:
         st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         credencial=ingreso_establecimiento_id(diccionario)
-        tabla(diccionario, credencial)
-        mapa(diccionario,credencial)
+        diccionario_tabla=x_escuela(diccionario, credencial )
+        tabla(diccionario_tabla, credencial)
+        mapa(diccionario_tabla,credencial)
         municipio=ingreso_municipio_nombre(diccionario)
         nivel=ingreso_nivel(diccionario)
         if municipio!="" and nivel!="":
@@ -308,6 +309,9 @@ def main():
     with col2:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
+
+
+
         
 
 
