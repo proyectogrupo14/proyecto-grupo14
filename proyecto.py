@@ -12,7 +12,7 @@ def estructura_datos()->dict:
   #  "Toma el archivo .csv, lee las filas, arma listas en base a las columnas y devuelve un diccionario donde"
   #  "la clave son str de los titulos provistos en la fila 0 del archivo.csv y el valor es una lista con los demás"
   #  "valores de la columna."
-    with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
+    with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
 
         municipio_id=[]
@@ -232,11 +232,9 @@ def ingreso_establecimiento_id(diccionario:dict)-> str:
     else:
         return ""
 
-#¿Cual es el nombre, direccion y establecimiento_id de instituciones educativas que se encuentran en Y municipio
-# de la prov de BA, de X nivel?
 def ingreso_municipio_nombre(diccionario:dict)-> str:
-    #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
-    #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
+    #Toma un diccionario y le pide al usuario que ingrese el nombre del municipio del cual desea obtener más 
+    #información. Devuelve un str que corresponde al municipio, si el municipio no existe, sino devuelve "".
     introduccion="Establecimientos por localidad y nivel educativo: "
     st.header(introduccion, anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
     municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
@@ -249,12 +247,16 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
         return ""
 
 def ingreso_nivel(diccionario:dict)->str:
+    #Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
+    #información. Devuelve un str que corresponde al nivel.
     nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=0, key=None, help=None, on_change=None,
      args=None, kwargs=None, disabled=False, horizontal=False, captions=None, label_visibility="visible", 
      width="content", bind=None)
     return nivel
     
 def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->list:
+    #Toma un diccionario, el str del municipio y el str del nivel y devuelve la posicion de las listas de los 
+    #establecimientos que cumplen ambas condiciones (municipio y nivel).
     indices=[]
     for j in range (0,cantidad_valores(diccionario, "municipio_nombre")):
         if municipio.lower() == diccionario["municipio_nombre"][j].lower() and nivel == diccionario["nivel"][j]:
@@ -262,6 +264,9 @@ def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->li
     return indices
    
 def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict:
+    #Toma un diccionario, el municipio (str) y el nivel (str) y devuelve un diccionario con los datos del nombre
+    #del establecimiento, dirección y el email de los establecimientos que son del municipio ingresado y del nivel
+    #seleccionado.
     indices=indices_tabla_establecimientos(diccionario,municipio,nivel)
     establecimiento_nombre=[]
     direccion=[]
@@ -274,6 +279,8 @@ def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict
     return datos_tabla
 
 def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
+    #Toma un diccionario, el municipio y el nivel y muestra una tabla con los datos del nombre del establecimiento, 
+    #dirección y el email de los establecimientos que son del municipio ingresado y del nivel seleccionado.
     datos_tabla=datos_tabla_establecimientos(diccionario, municipio, nivel)
     if len(datos_tabla["Nombre del Establecimiento"]) > 0:
         tabla=st.table(data=datos_tabla, border=True, width="stretch", height="content",
