@@ -340,11 +340,13 @@ def grafico_torta_municipio(diccionario: dict):
             sizes.append(len(indices))
             labels.append(nivel)
 
-    colores=["purple","royalblue","skyblue","yellowgreen","red","orangered","gold"]
+    colores=["#7b1fa2", "#5c6bc0", "#26c6da", "#9ccc65", "#ef5350", "#ff7043", "#ffca28"]
+    propiedades_porciones = {'linewidth': 2, 'edgecolor': 'white'}
+    propiedades_texto = {'fontsize': 10}
 
     fig, ax = plt.subplots()
     ax.pie(sizes, explode=None, labels=labels, colors=colores, autopct='%1.1f%%', pctdistance=0.6, shadow=False, 
-             labeldistance=1.1, startangle=90, radius=1, counterclock=True, wedgeprops=None, textprops=None, 
+             labeldistance=1.1, startangle=90, radius=1, counterclock=True, wedgeprops=propiedades_porciones, textprops=propiedades_texto, 
              center=(0, 0), frame=False, rotatelabels=False, normalize=True, hatch=None, data=None)
     ax.set_title(f"Distribución de establecimientos por nivel en {municipio}:")
     st.pyplot(fig)
