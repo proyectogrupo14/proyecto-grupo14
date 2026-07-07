@@ -12,7 +12,7 @@ def estructura_datos()->dict:
   #  "Toma el archivo .csv, lee las filas, arma listas en base a las columnas y devuelve un diccionario donde"
   #  "la clave son str de los titulos provistos en la fila 0 del archivo.csv y el valor es una lista con los demás"
   #  "valores de la columna."
-    with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
+    with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
 
         municipio_id=[]
@@ -238,12 +238,13 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
     municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
-    #corregir x while
-    for i in range (0,cantidad_valores(diccionario,"municipio_nombre")):
+    i = 0
+    while i < cantidad_valores(diccionario, "municipio_nombre"):
         if municipio.lower() == diccionario["municipio_nombre"][i].lower():
             return municipio
-        else:
-            return ""
+        i += 1
+
+    return ""
 
 def ingreso_nivel(diccionario:dict)->str:
     #Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
@@ -290,6 +291,58 @@ def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
         st.markdown(texto, unsafe_allow_html=False, help=None, width="auto", text_alignment="left")
 
 
+
+
+
+def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
+    '''esta funcion toma un diccionario y devuelve la cantiadad de escuelas que hay 
+    dependiendo el nivel
+    cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
+    cantidad_escuelas_nivel([], "Nivel Secundario") == 0
+    cantidad_escuelas_nivel(diccionario, "Formacion Intregal") == 1'''
+    cantidad = 0
+    for niv in diccionario["nivel"]:
+        if niv == nivel:
+            cantidad +=1
+        
+    return cantidad
+
+def selector_niveles(diccionario:dict):
+    #crea un selector de cajas con los niveles posibles y devuelve la cantidad de escuelas de ese nivel
+    nivel = st.selectbox("elija un nivel de escuela:",
+                          tipos_valores(diccionario, "nivel"),
+                          index = None,
+                          placeholder="Seleccione un nivel:")
+    if nivel is not None:
+        cant = cantidad_escuelas_nivel(diccionario, nivel)
+        st.write("Hay " + str(cant) + " escuelas de " + nivel)
+
+
+
+def grafico_torta_municipio(diccionario: dict, municipio:str):
+    if municipio == "":
+        return
+
+    niveles = []
+    cantidades = []
+
+    for nivel in tipos_valores(diccionario, "nivel"):
+        indices = indices_tabla_establecimientos(diccionario, municipio, nivel)
+
+        if len(indices) > 0:
+            niveles.append(nivel)
+            cantidades.append(len(indices))
+
+    fig, ax = plt.subplots()
+
+    ax.pie(cantidades, labels=niveles, autopct="%1.1f%%")
+    ax.set_title(f"Escuelas por nivel en {municipio}")
+
+    st.pyplot(fig)
+
+
+
+
 def main():
     #Entrada y salida de datos.
     diccionario = estructura_datos()
@@ -309,6 +362,11 @@ def main():
     with col2:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
+        st.header("Cantidad de escuelas por nivel", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+        selector_niveles(diccionario)
+        municipio2=ingreso_municipio_nombre(diccionario)
+        if municipio2!="":
+            grafico_torta_municipio(diccionario,municipio2)
 
 
 

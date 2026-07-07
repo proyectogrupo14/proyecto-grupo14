@@ -1,11 +1,11 @@
-from proyecto import (estructura_datos,cantidad_valores,tipos_valores,niveles_modalidad,agregar_datos)
+from proyecto import (estructura_datos,cantidad_valores,tipos_valores,niveles_modalidad,agregar_datos,cantidad_escuelas_nivel)
 
 #Cargar los datos una sola vez
 diccionario = estructura_datos()
 
 
 def test_cantidad_valores():
-    assert cantidad_valores(diccionario, "nivel") == 12000
+    assert cantidad_valores(diccionario, "nivel") == 22
 
 
 def test_tipos_y_niveles():
@@ -26,3 +26,8 @@ def test_agregar_datos():
     assert niveles[2] == "Nivel Primario\nEducación Común"
     assert sexo["Varones"][0] > 0
     assert sexo["Mujeres"][0] > 0
+
+def test_cantidad_escuelas_nivel():
+    assert cantidad_escuelas_nivel(diccionario, "Nivel Primario") == 5
+    assert cantidad_escuelas_nivel(diccionario, "Nivel Inicial") == 3
+    assert cantidad_escuelas_nivel(diccionario, "Nivel Superior") == 0
