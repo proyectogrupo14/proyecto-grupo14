@@ -2,6 +2,7 @@ import csv
 import codecs
 import streamlit as st
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 #Para ejecutar el programa: 
 #pip install streamlit
@@ -12,7 +13,7 @@ def estructura_datos()->dict:
   #  "Toma el archivo .csv, lee las filas, arma listas en base a las columnas y devuelve un diccionario donde"
   #  "la clave son str de los titulos provistos en la fila 0 del archivo.csv y el valor es una lista con los demás"
   #  "valores de la columna."
-    with open('establecimientos-educativos-prueba.csv', encoding="utf-8") as escuelas_ba:
+    with open('establecimientos-educativos-12K.csv', encoding="utf-8") as escuelas_ba:
         escuelas_ba = csv.reader(escuelas_ba)
 
         municipio_id=[]
@@ -291,11 +292,10 @@ def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
         st.markdown(texto, unsafe_allow_html=False, help=None, width="auto", text_alignment="left")
 
 
-
-
+#¿Cuántas escuelas hay en la provincia de Buenos Aires dependiendo su nivel?
 
 def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
-    '''esta funcion toma un diccionario y devuelve la cantiadad de escuelas que hay 
+    '''esta funcion toma un diccionario y devuelve la cantidad de escuelas que hay 
     dependiendo el nivel
     cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
     cantidad_escuelas_nivel([], "Nivel Secundario") == 0
@@ -309,36 +309,52 @@ def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
 
 def selector_niveles(diccionario:dict):
     #crea un selector de cajas con los niveles posibles y devuelve la cantidad de escuelas de ese nivel
-    nivel = st.selectbox("elija un nivel de escuela:",
+    nivel = st.selectbox("Elija un nivel de escuela:",
                           tipos_valores(diccionario, "nivel"),
                           index = None,
                           placeholder="Seleccione un nivel:")
     if nivel is not None:
         cant = cantidad_escuelas_nivel(diccionario, nivel)
-        st.write("Hay " + str(cant) + " escuelas de " + nivel)
+        st.write("Hay " + str(cant) + " escuelas de " + nivel + "en la Provincia de Buenos Aires.")
 
 
+#¿En el municipio Y, como están distribuidas porcentualmente los distintos niveles de escuelas?
 
-def grafico_torta_municipio(diccionario: dict, municipio:str):
+def ingreso_municipio_selector(diccionario:dict):
+    municipio=st.selectbox("Por favor, seleccione el municipio:", tipos_valores(diccionario, "municipio_nombre"), 
+                           index=0, key=None, help=None, on_change=None, args=None, kwargs=None, placeholder=None,
+                           disabled=False, label_visibility="visible", accept_new_options=False, filter_mode="fuzzy", 
+                           width="stretch", bind=None)
+    return municipio
+
+
+def grafico_torta_municipio(diccionario: dict):
+    municipio=ingreso_municipio_selector(diccionario)
     if municipio == "":
         return
-
-    niveles = []
-    cantidades = []
-
+    sizes=[]
+    labels=[]
     for nivel in tipos_valores(diccionario, "nivel"):
         indices = indices_tabla_establecimientos(diccionario, municipio, nivel)
+        if indices!=[]:
+            sizes.append(len(indices))
+            labels.append(nivel)
 
-        if len(indices) > 0:
-            niveles.append(nivel)
-            cantidades.append(len(indices))
+    colores=["purple","royalblue","skyblue","yellowgreen","red","orangered","gold"]
 
     fig, ax = plt.subplots()
-
-    ax.pie(cantidades, labels=niveles, autopct="%1.1f%%")
-    ax.set_title(f"Escuelas por nivel en {municipio}")
-
+    ax.pie(sizes, explode=None, labels=labels, colors=colores, autopct='%1.1f%%', pctdistance=0.6, shadow=False, 
+             labeldistance=1.1, startangle=90, radius=1, counterclock=True, wedgeprops=None, textprops=None, 
+             center=(0, 0), frame=False, rotatelabels=False, normalize=True, hatch=None, data=None)
+    ax.set_title(f"Distribución de establecimientos por nivel en {municipio}:")
     st.pyplot(fig)
+
+
+
+#Mostrar la información resumida de escuelas rurales, detallando por cada municipio la siguiente información:
+#¿Cuantas hay ?
+#¿Cuantas son publicas? y Cuántas son privadas?
+#¿Cuantos estudiantes asisten a estas escuelas?
 
 
 
@@ -359,14 +375,16 @@ def main():
         nivel=ingreso_nivel(diccionario)
         if municipio!="" and nivel!="":
             tabla_establecimientos(diccionario,municipio,nivel)  
+        st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles de escuelas?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+       # municipio2=ingreso_municipio_selector(diccionario)
+        grafico_torta_municipio(diccionario)
     with col2:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
         st.header("Cantidad de escuelas por nivel", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         selector_niveles(diccionario)
-        municipio2=ingreso_municipio_nombre(diccionario)
-        if municipio2!="":
-            grafico_torta_municipio(diccionario,municipio2)
+    
+
 
 
 
