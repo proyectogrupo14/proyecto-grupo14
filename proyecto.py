@@ -184,7 +184,7 @@ def ingreso_establecimiento_id(diccionario:dict)-> str:
     #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
     #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
     id=st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
-                    on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
+                    on_change=None, args=None, kwargs=None, placeholder="Ingrese el id del establecimiento.", disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
     if id in diccionario["establecimiento_id"]:
         return id
@@ -237,7 +237,7 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
     introduccion="Establecimientos por localidad y nivel educativo: "
     st.header(introduccion, anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
     municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
-                    on_change=None, args=None, kwargs=None, placeholder=None, disabled=False, 
+                    on_change=None, args=None, kwargs=None, placeholder="Ingrese el nombre del municipio", disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
     i = 0
     while i < cantidad_valores(diccionario, "municipio_nombre"):
@@ -250,7 +250,7 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
 def ingreso_nivel(diccionario:dict)->str:
     #Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
     #información. Devuelve un str que corresponde al nivel.
-    nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=0, key=None, help=None, on_change=None,
+    nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=None, key=None, help=None, on_change=None,
      args=None, kwargs=None, disabled=False, horizontal=False, captions=None, label_visibility="visible", 
      width="content", bind=None)
     return nivel
@@ -309,13 +309,13 @@ def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
 
 def selector_niveles(diccionario:dict):
     #crea un selector de cajas con los niveles posibles y devuelve la cantidad de escuelas de ese nivel
-    nivel = st.selectbox("Elija un nivel de escuela:",
+    nivel = st.selectbox("Por favor, seleccione un nivel educativo:",
                           tipos_valores(diccionario, "nivel"),
                           index = None,
-                          placeholder="Seleccione un nivel:")
+                          placeholder="Seleccione un nivel educativo.")
     if nivel is not None:
         cant = cantidad_escuelas_nivel(diccionario, nivel)
-        st.write("Hay " + str(cant) + " escuelas de " + nivel + "en la Provincia de Buenos Aires.")
+        st.write("Hay " + str(cant) + " escuelas de " + nivel + " en la Provincia de Buenos Aires.")
 
 
 #¿En el municipio Y, como están distribuidas porcentualmente los distintos niveles de escuelas?
@@ -351,14 +351,55 @@ def grafico_torta_municipio(diccionario: dict):
     ax.set_title(f"Distribución de establecimientos por nivel en {municipio}:")
     st.pyplot(fig)
 
-
-
 #Mostrar la información resumida de escuelas rurales, detallando por cada municipio la siguiente información:
 #¿Cuantas hay ?
 #¿Cuantas son publicas? y Cuántas son privadas?
 #¿Cuantos estudiantes asisten a estas escuelas?
 
+def escuelas_rurales_lista(diccionario:dict, municipio:str)-> dict:
+    #Toma un diccionario y devuelve un diccionario que especifica la cantidad de escuelas rurales por municipio, cuántas
+    #son públicas, cuántas son privadas y la cantidad de alumno que tienen.
+    cantidad_escuelas_rurales=0
+    cantidad_alumnos=0
+    cantidad_publicas=0
+    cantidad_privadas=0
+    lista_escuelas_rurales= [municipio, cantidad_escuelas_rurales, cantidad_alumnos, cantidad_publicas, cantidad_privadas]
+    for indice in range(cantidad_valores(diccionario, "municipio_nombre")):
+        if diccionario["municipio_nombre"][indice] == municipio and (diccionario["ambito"][indice] == "Rural Agrupado" or diccionario["ambito"][indice] == "Rural Disperso"):
+            cantidad_escuelas_rurales+=1
+            cantidad_alumnos+=int(diccionario["matricula"][indice])
+            if diccionario["sector"][indice]=="Estatal":
+                cantidad_publicas+=1
+            else: 
+                cantidad_privadas+=1
 
+            lista_escuelas_rurales= [municipio, cantidad_escuelas_rurales, cantidad_alumnos, cantidad_publicas, cantidad_privadas]
+    return lista_escuelas_rurales
+
+def escuelas_rurales_diccionario(diccionario:dict)->dict:
+    diccionario_escuelas_rurales={
+        "Municipio":[],
+        "Cantidad de Escuelas Rurales":[],
+        "Cantidad de Alumnos":[],
+        "N° de Escuelas Rurales Estatales":[],
+        "N° de Escuelas Rurales Privadas":[]
+    }
+    for municipio in tipos_valores(diccionario,"municipio_nombre"):
+        lista_datos=escuelas_rurales_lista(diccionario,municipio)
+        diccionario_escuelas_rurales["Municipio"].append(lista_datos[0])
+        diccionario_escuelas_rurales["Cantidad de Escuelas Rurales"].append(lista_datos[1])
+        diccionario_escuelas_rurales["Cantidad de Alumnos"].append(lista_datos[2])
+        diccionario_escuelas_rurales["N° de Escuelas Rurales Estatales"].append(lista_datos[3])
+        diccionario_escuelas_rurales["N° de Escuelas Rurales Privadas"].append(lista_datos[4])
+
+    return diccionario_escuelas_rurales
+
+def tabla_escuelas_rurales(diccionario_escuelas_rurales: dict):
+    #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
+    #con los datos más relevantes del establecimiento.
+    tabla_escuelas_rurales= st.table(data=diccionario_escuelas_rurales, border=True, width="stretch", height="content", 
+                        hide_index=None, hide_header=None)
+    return tabla_escuelas_rurales
 
 
 def main():
@@ -366,25 +407,50 @@ def main():
     diccionario = estructura_datos()
     st.set_page_config(layout="wide")
     st.title("Escuelas de la Provincia de Buenos Aires", anchor=None, help=None, width="stretch", text_alignment="center")
-    col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
-    with col1:
-        st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
-        credencial=ingreso_establecimiento_id(diccionario)
-        diccionario_tabla=x_escuela(diccionario, credencial )
+
+    st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, 
+                  width="stretch", text_alignment="center")
+    credencial=ingreso_establecimiento_id(diccionario)
+    pregunta1=st.expander("Seleccione para ver más.",
+                          expanded=True, key=None, icon=None, type="default", width="stretch", on_change="ignore", 
+                        args=None, kwargs=None)     
+    with pregunta1:
+        diccionario_tabla=x_escuela(diccionario, credencial)
         tabla(diccionario_tabla, credencial)
         mapa(diccionario_tabla,credencial)
-        municipio=ingreso_municipio_nombre(diccionario)
-        nivel=ingreso_nivel(diccionario)
+
+    st.header("Cantidad de escuelas por Nivel Educativo.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    selector_niveles(diccionario)
+
+    municipio=ingreso_municipio_nombre(diccionario)
+    nivel=ingreso_nivel(diccionario)
+    pregunta2=st.expander("Seleccione para ver más.",
+                expanded=False, key=None, icon=None, type="default", width="stretch", on_change="ignore", 
+                args=None, kwargs=None)     
+    with pregunta2:
         if municipio!="" and nivel!="":
             tabla_establecimientos(diccionario,municipio,nivel)  
+    
+    
+        
+    col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
+    with col1:
         st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles de escuelas?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
-       # municipio2=ingreso_municipio_selector(diccionario)
         grafico_torta_municipio(diccionario)
     with col2:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
-        st.header("Cantidad de escuelas por nivel", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
-        selector_niveles(diccionario)
+        
+        
+    st.header("Información sobre Escuelas Rurales.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    pregunta3=st.expander("Seleccione para ver más.",
+                          expanded=False, key=None, icon=None, type="default", width="stretch", on_change="ignore", 
+                        args=None, kwargs=None)     
+    with pregunta3:
+        diccionario_escuelas_rurales=escuelas_rurales_diccionario(diccionario)
+        tabla_escuelas_rurales(diccionario_escuelas_rurales)
+   
+
     
 
 
