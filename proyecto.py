@@ -247,7 +247,36 @@ def selector_niveles(diccionario:dict):
         cant = cantidad_escuelas_nivel(diccionario, nivel)
         st.write("Hay " + str(cant) + " escuelas de " + nivel + " en la Provincia de Buenos Aires.")
 
+        mapa_nivel(diccionario, nivel)
 
+def mapa_nivel(diccionario: dict, nivel: str):
+    '''Muestra en un mapa todas las escuelas del nivel seleccionado.'''
+
+    latitudes = []
+    longitudes = []
+
+    for i in range(cantidad_valores(diccionario, "nivel")):
+        if (diccionario["nivel"][i] == nivel and
+            diccionario["latitud"][i] != "" and
+            diccionario["longitud"][i] != ""):
+
+            latitudes.append(float(diccionario["latitud"][i]))
+            longitudes.append(float(diccionario["longitud"][i]))
+
+    if len(latitudes) > 0:
+        st.map(
+            data={
+                "lat": latitudes,
+                "lon": longitudes
+            },
+            height=500
+        )
+    else:
+        st.write("No hay escuelas para mostrar.")
+
+
+#¿Cuál es el nombre, dirección e e-mail de las
+#instituciones educativas que se encuentran en Y municipio de la provincia de Buenos Aires, de X nivel?
 
 def ingreso_municipio_nombre(diccionario:dict)-> str:
     '''Toma un diccionario y le pide al usuario que ingrese el nombre del municipio del cual desea obtener más 
