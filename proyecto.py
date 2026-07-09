@@ -348,6 +348,27 @@ def ingreso_municipio_selector(diccionario:dict):
                            width="stretch", bind=None)
     return municipio
 
+def calculo_suma(sizes:list)->float:
+    cantidad=0
+    for valor in sizes:
+        cantidad+=valor
+    return cantidad
+
+def calculo_porcentaje(sizes:list)->list:
+    lista_porcentaje=[]
+    total=calculo_suma(sizes)
+    for valor in sizes:
+        porcentaje_float=(valor/total)*100
+        porcentaje=round(porcentaje_float,1)
+        lista_porcentaje.append(porcentaje)
+    return lista_porcentaje
+
+def union_listas(lista1:list, lista2:list)->list:
+    lista_total=[]
+    for indice in range (0, len(lista1)):
+        lista_total.append(lista2[indice]+" ("+str(lista1[indice])+"%)")
+    return lista_total
+
 def grafico_torta_municipio(diccionario: dict):
     municipio=ingreso_municipio_selector(diccionario)
     if municipio == "":
@@ -360,16 +381,24 @@ def grafico_torta_municipio(diccionario: dict):
             sizes.append(len(indices))
             labels.append(nivel)
 
-    colores=["#7b1fa2", "#5c6bc0", "#26c6da", "#9ccc65", "#ef5350", "#ff7043", "#ffca28"]
-    propiedades_porciones = {'linewidth': 2, 'edgecolor': 'white'}
+    colores=plt.color_sequences['Paired']
+    propiedades_porciones = {'linewidth': 1, 'edgecolor': 'white'}
     propiedades_texto = {'fontsize': 10}
 
     fig, ax = plt.subplots()
-    ax.pie(sizes, explode=None, labels=labels, colors=colores, autopct='%1.1f%%', pctdistance=0.6, shadow=False, 
-             labeldistance=1.1, startangle=90, radius=1, counterclock=True, wedgeprops=propiedades_porciones, textprops=propiedades_texto, 
-             center=(0, 0), frame=False, rotatelabels=False, normalize=True, hatch=None, data=None)
-    ax.set_title(f"Distribución de establecimientos por nivel en {municipio}:")
+    grafico_tortas = ax.pie(sizes, explode=None, labels=None, colors=colores, autopct=None, pctdistance=0.6, shadow=False, 
+                    labeldistance=1.1, startangle=90, radius=1, counterclock=True, wedgeprops=propiedades_porciones, textprops=propiedades_texto, 
+                    center=(0, 0), frame=False, rotatelabels=False, normalize=True, hatch=None, data=None)
+
+    lista_porcentaje=calculo_porcentaje(sizes)
+    leyenda=union_listas(lista_porcentaje, labels)
+
+    ax.legend(grafico_tortas.wedges, leyenda,
+          title="Niveles Educativos",
+          loc="center left",
+          bbox_to_anchor=(1, 0, 0.5, 1))
     st.pyplot(fig)
+
 
 
 #¿Cuántos varones y mujeres hay en las escuelas de nivel inicial,
@@ -463,12 +492,15 @@ def main():
     st.header("Información y ubicación del establecimiento en base a su id.", anchor=None, help=None, divider=False, 
                   width="stretch", text_alignment="center")
     credencial=ingreso_establecimiento_id(diccionario)
-    pregunta1=st.expander("Seleccione para ver más.",
+    col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
+    with col1:
+        pregunta1=st.expander("Seleccione para ver más.",
                           expanded=True, key=None, icon=None, type="default", width="stretch", on_change="ignore", 
                         args=None, kwargs=None)     
-    with pregunta1:
-        diccionario_tabla=x_escuela(diccionario, credencial)
-        tabla(diccionario_tabla, credencial)
+        with pregunta1:
+            diccionario_tabla=x_escuela(diccionario, credencial)
+            tabla(diccionario_tabla, credencial)
+    with col2:
         mapa(diccionario_tabla,credencial)
 
     st.header("Cantidad de escuelas por Nivel Educativo.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
@@ -485,11 +517,11 @@ def main():
     
     
         
-    col1, col2 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
-    with col1:
-        st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles de escuelas?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    col3, col4 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
+    with col3:
+        st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles educativos de las instituciones?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico_torta_municipio(diccionario)
-    with col2:
+    with col4:
         st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
         grafico(diccionario)
         
