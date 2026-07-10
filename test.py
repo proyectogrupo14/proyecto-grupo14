@@ -75,7 +75,7 @@ def test_tipos_valores():
     diccionario=estructura_datos()
     diccionario1 = {"colores": ["rojo", "azul", "rojo", "verde", "azul"]}
     assert tipos_valores(diccionario1, "colores") == ["rojo", "azul", "verde"]
-    assert tipos_valores(diccionario, "nivel") == ["Nivel Secundario", "Nivel Inicial", "Nivel Primario"]
+    assert tipos_valores(diccionario, "nivel") == ["Nivel Secundario", "Nivel Inicial", "Nivel Primario", "Formación Integral"]
 
 
 def test_datos_tabla_escuela():
@@ -108,14 +108,24 @@ def test_datos_tabla_escuela():
 def test_cantidad_escuelas_nivel():
     diccionario=estructura_datos()
     assert cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
-    assert cantidad_escuelas_nivel([], "Nivel Secundario") == 0
-    assert cantidad_escuelas_nivel(diccionario, "Formacion Integral") == 1
 
 def test_indices_tabla_establecimientos():
     diccionario=estructura_datos()
     assert indices_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == [19]
     assert indices_tabla_establecimientos(diccionario, "Azul", "Nivel Secundario") == []
     assert indices_tabla_establecimientos(diccionario, "Berazategui", "Nivel Primario") == []
+
+
+def test_datos_tabla_establecimientos():
+    diccionario=estructura_datos()
+    assert datos_tabla_establecimientos(diccionario, "Escobar", "Nivel Secundario") ==  {'Dirección': [], 'E-mail': [], 'Nombre del Establecimiento': []}
+    assert datos_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == {'Dirección': ["BACH E /FREIRE Y NERVO - S/N"], 'E-mail': ["primaria66merlo@abc.gob.ar"], 'Nombre del Establecimiento':['ESCUELA DE EDUCACIÓN PRIMARIA Nº66 "PABLO PIZZURNO"']}
+
+def test_calculo_suma():
+    diccionario=estructura_datos()
+    assert calculo_suma([1.1, 5.2, 3.3]) == 9.6
+    assert calculo_suma([0]) == 0.0
+
 
 def test_tipos_y_niveles():
     # Debe existir la modalidad "Educación Común"

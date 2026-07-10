@@ -181,12 +181,10 @@ def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
     #Toma un diccionario y devuelve la cantidad de escuelas que hay dependiendo el nivel educativo.
     #EJ con archivo de prueba:
     #cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
-    #cantidad_escuelas_nivel([], "Nivel Secundario") == 0
-    #cantidad_escuelas_nivel(diccionario, "Formacion Intregal") == 1'''
     cantidad = 0
     for niv in diccionario["nivel"]:
         if niv == nivel:
-            cantidad +=1
+            cantidad+=1
         
     return cantidad
 
@@ -268,6 +266,12 @@ def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict
 #Toma un diccionario, el municipio (str) y el nivel (str) y devuelve un diccionario con los datos del nombre
 #del establecimiento, dirección y el email de los establecimientos que son del municipio ingresado y del nivel
 #seleccionado.
+#EJ con archivo de prueba:
+#datos_tabla_establecimientos(diccionario, "Escobar", "Nivel Secundario") ==  {'Dirección': [], 'E-mail': [],
+# 'Nombre del Establecimiento': []}
+#datos_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == {'Dirección': ["BACH E /FREIRE Y NERVO - S/N"], 
+#'E-mail': ["primaria66merlo@abc.gob.ar"], 'Nombre del Establecimiento':['ESCUELA DE EDUCACIÓN PRIMARIA Nº66 "PABLO PIZZURNO"']}
+
     indices=indices_tabla_establecimientos(diccionario,municipio,nivel)
     establecimiento_nombre=[]
     direccion=[]
@@ -291,8 +295,9 @@ def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
         texto="No existen establecimientos de tal nivel en la localidad ingresada."
         st.markdown(texto, unsafe_allow_html=False, help=None, width="auto", text_alignment="left")
 
-
+#----------------------------------------------------------------------
 #¿En el municipio Y, como están distribuidas porcentualmente los distintos niveles de escuelas?
+#----------------------------------------------------------------------
 
 def ingreso_municipio_selector(diccionario:dict):
     municipio=st.selectbox("Por favor, seleccione el municipio:", tipos_valores(diccionario, "municipio_nombre"), 
@@ -340,6 +345,8 @@ def union_listas(lista1:list, lista2:list)->list:
     return lista_total
 
 def grafico_torta_municipio(diccionario: dict):
+    #Dibuja un gráfico de tortas de la proporción de los niveles educativos según el municipio seleccionado.
+
     municipio=ingreso_municipio_selector(diccionario)
     if municipio == "":
         return
@@ -369,10 +376,10 @@ def grafico_torta_municipio(diccionario: dict):
           bbox_to_anchor=(1, 0, 0.5, 1))
     st.pyplot(fig)
 
-
-
-#¿Cuántos varones y mujeres hay en las escuelas de nivel inicial,
-# secundario y primario de la provincia de Buenos Aires, separadas por modalidad de la escuela?
+#-------------------------------------------------------------------------------
+#¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario de la provincia de
+# Buenos Aires, separadas por modalidad de la escuela?
+#------------------------------------------------------------------------------
 
 def lista_indices_modalidad(diccionario:dict, nivel:str, modalidad:str) -> list:
     """  Filtra y devuelve una lista con el indice de los establecimientos que pertencen al nivel 
@@ -404,7 +411,7 @@ def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) 
 
 
 def datos_grafico_barras(diccionario: dict, nivel: str) -> tuple:
-#    Prepara el iterable (diccionario) con los datos estructurados para el gráfico.
+#    Prepara un diccionario con los datos estructurados para el gráfico.
 #   Devuelve también la lista de modalidades para usar en el eje X.
 
     modalidades = tipos_valores(diccionario, "modalidad")
@@ -446,11 +453,12 @@ def grafico_barras(diccionario: dict, nivel: str, color:str):
 
     st.pyplot(fig)
 
-
+#---------------------------------------------------------------------------
 #Mostrar la información resumida de escuelas rurales, detallando por cada municipio la siguiente información:
 #¿Cuantas hay ?
 #¿Cuantas son publicas? y Cuántas son privadas?
 #¿Cuantos estudiantes asisten a estas escuelas?
+#----------------------------------------------------------------
 
 def escuelas_rurales_lista(diccionario:dict, municipio:str)-> dict:
     '''Toma un diccionario y devuelve un diccionario que especifica la cantidad de escuelas rurales por municipio, cuántas
