@@ -71,7 +71,7 @@ def test_cantidad_valores():
     assert cantidad_valores(diccionario, "nivel") == 21
 
 
-def tipos_valores():
+def test_tipos_valores():
     diccionario=estructura_datos()
     diccionario1 = {"colores": ["rojo", "azul", "rojo", "verde", "azul"]}
     assert tipos_valores(diccionario1, "colores") == ["rojo", "azul", "verde"]
@@ -92,27 +92,30 @@ def test_datos_tabla_escuela():
                     "latitud": ["-32.9", "-32.8", "-32.7"],
                     "longitud": ["-60.7", "-60.6", "-60.5"]}
 
-    diccionario2 =  {"establecimiento_nombre": "Escuela Belgrano",
-                        "nivel": "Nivel Primario",
-                        "modalidad": "Común",
-                        "direccion": "Calle A",
-                        "municipio": "Rosario",
-                        "correo": "a@gmail.com",
-                        "telefono": "1111",
-                        "sector": "Estatal",
-                        "latitud": "-32.9",
-                        "longitud": "-60.7"}
-    assert datos_tabla_escuela(diccionario1,"100") == diccionario2
+    diccionario2 =  {"Nombre": "Escuela Belgrano",
+                        "Nivel": "Nivel Primario",
+                        "Modalidad": "Común",
+                        "Dirección": "Calle A",
+                        "Municipio": "Rosario",
+                        "Correo": "a@gmail.com",
+                        "Teléfono": "1111",
+                        "Sector": "Estatal",
+                        "Latitud": "-32.9",
+                        "Longitud": "-60.7"}
+
+    assert datos_tabla_escuela(diccionario1, "100") == diccionario2
 
 def test_cantidad_escuelas_nivel():
     diccionario=estructura_datos()
     assert cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
     assert cantidad_escuelas_nivel([], "Nivel Secundario") == 0
-    assert cantidad_escuelas_nivel(diccionario, "Formacion Intregal") == 1
+    assert cantidad_escuelas_nivel(diccionario, "Formacion Integral") == 1
 
 def test_indices_tabla_establecimientos():
     diccionario=estructura_datos()
-    assert indices_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == 
+    assert indices_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == [19]
+    assert indices_tabla_establecimientos(diccionario, "Azul", "Nivel Secundario") == []
+    assert indices_tabla_establecimientos(diccionario, "Berazategui", "Nivel Primario") == []
 
 def test_tipos_y_niveles():
     # Debe existir la modalidad "Educación Común"
@@ -133,7 +136,3 @@ def test_agregar_datos():
     assert sexo["Varones"][0] > 0
     assert sexo["Mujeres"][0] > 0
 
-def test_cantidad_escuelas_nivel():
-    assert cantidad_escuelas_nivel(diccionario, "Nivel Primario") == 5
-    assert cantidad_escuelas_nivel(diccionario, "Nivel Inicial") == 3
-    assert cantidad_escuelas_nivel(diccionario, "Nivel Superior") == 0

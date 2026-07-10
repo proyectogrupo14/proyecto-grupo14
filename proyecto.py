@@ -134,24 +134,26 @@ def datos_tabla_escuela(diccionario: dict, credencial="" ) -> dict:
     #                                               "sector": "Estatal",
     #                                               "latitud": "-32.9",
     #                                               "longitud": "-60.7"}
-
+    i=0
     if credencial != "":
-        for i in range(cantidad_valores(diccionario, "establecimiento_id")):
-            if diccionario["establecimiento_id"][i] == credencial:
-                diccionario_tabla= {
-                "establecimiento_nombre": diccionario["establecimiento_nombre"][i],
-                "nivel": diccionario["nivel"][i],
-                "modalidad": diccionario["modalidad"][i],
-                "direccion": diccionario["direccion"][i],
-                "municipio": diccionario["municipio_nombre"][i],
-                "correo": diccionario["email"][i],
-                "telefono": diccionario["telefono"][i],
-                "sector": diccionario["sector"][i],
-                "latitud": diccionario["latitud"][i],
-               "longitud": diccionario["longitud"][i]}
-                return diccionario_tabla
-        return {}
-    return None
+        while i < cantidad_valores(diccionario, "establecimiento_id") and str(diccionario["establecimiento_id"][i]) != credencial:
+            i+=1
+
+    if str(diccionario["establecimiento_id"][i]) == credencial:    
+        diccionario_tabla= {
+            "Nombre": diccionario["establecimiento_nombre"][i],
+            "Nivel": diccionario["nivel"][i],
+            "Modalidad": diccionario["modalidad"][i],
+            "Dirección": diccionario["direccion"][i],
+            "Municipio": diccionario["municipio_nombre"][i],
+            "Correo": diccionario["email"][i],
+            "Teléfono": diccionario["telefono"][i],
+            "Sector": diccionario["sector"][i],
+            "Latitud": diccionario["latitud"][i],
+            "Longitud": diccionario["longitud"][i]}
+        return diccionario_tabla         
+    return {}
+    
 
 def tabla_escuela(diccionario_tabla: dict, credencial=""):
     #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
@@ -165,8 +167,8 @@ def mapa_escuela(diccionario_tabla:dict,credencial=""):
     #Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
     #coordenada donde se halla el establcimiento.
     if credencial != "":
-        lat=diccionario_tabla["latitud"]
-        long=diccionario_tabla["longitud"]
+        lat=diccionario_tabla["Latitud"]
+        long=diccionario_tabla["Longitud"]
         st.map(data={"lat": [float(lat)], "lon": [float(long)]}, latitude=None, longitude=None, 
            color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
     return None
@@ -251,6 +253,11 @@ def ingreso_nivel(diccionario:dict)->str:
 def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->list:
 # Toma un diccionario, el str del municipio y el str del nivel y devuelve una lista de indices de los establecimientos 
 # que cumplen ambas condiciones (municipio y nivel).'''
+#EJ con archivo de prueba:
+# indices_tabla_establecimientos(diccionario, "Merlo", "Nivel Primario") == [19]
+# indices_tabla_establecimientos(diccionario, "Azul", "Nivel Secundario") == []
+# indices_tabla_establecimientos(diccionario, "Berazategui", "Nivel Primario") == []
+
     indices=[]
     for j in range (0,cantidad_valores(diccionario, "municipio_nombre")):
         if municipio.lower() == diccionario["municipio_nombre"][j].lower() and nivel == diccionario["nivel"][j]:
@@ -258,9 +265,9 @@ def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->li
     return indices
    
 def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict:
-    '''Toma un diccionario, el municipio (str) y el nivel (str) y devuelve un diccionario con los datos del nombre
-    del establecimiento, dirección y el email de los establecimientos que son del municipio ingresado y del nivel
-    seleccionado.'''
+#Toma un diccionario, el municipio (str) y el nivel (str) y devuelve un diccionario con los datos del nombre
+#del establecimiento, dirección y el email de los establecimientos que son del municipio ingresado y del nivel
+#seleccionado.
     indices=indices_tabla_establecimientos(diccionario,municipio,nivel)
     establecimiento_nombre=[]
     direccion=[]
@@ -273,8 +280,8 @@ def datos_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->dict
     return datos_tabla
 
 def tabla_establecimientos(diccionario:dict,municipio:str,nivel:str):
-    '''Toma un diccionario, el municipio y el nivel y muestra una tabla con los datos del nombre del establecimiento, 
-    dirección y el email de los establecimientos que son del municipio ingresado y del nivel seleccionado.'''
+# Toma un diccionario, el municipio y el nivel y muestra una tabla con los datos del nombre del establecimiento, 
+# dirección y el email de los establecimientos que son del municipio ingresado y del nivel seleccionado.'''
     datos_tabla=datos_tabla_establecimientos(diccionario, municipio, nivel)
     if len(datos_tabla["Nombre del Establecimiento"]) > 0:
         tabla=st.table(data=datos_tabla, border=True, width="stretch", height="content",
