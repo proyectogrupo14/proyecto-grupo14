@@ -2,11 +2,6 @@ import csv
 import codecs
 import streamlit as st
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-
-#Para ejecutar el programa: 
-#pip install streamlit
-#python -m streamlit run proyecto.py
 
 
 def estructura_datos()->dict:
@@ -78,77 +73,33 @@ def estructura_datos()->dict:
 
     
 def cantidad_valores(diccionario:dict, clave:str)->int:
-    '''Toma una clave del diccionario y evalua cuántos elementos posee la lista que 
-    representa su valor.
-    ejemplo:cantidad_valores(diccionario, "nivel") == 22'''
+    #Toma una clave del diccionario y evalua cuántos elementos posee la lista que 
+    #representa su valor.
+    #EJ con archivo prueba: cantidad_valores(diccionario, "municipio_nombre") == 22
+    #                       cantidad_valores(diccionario, "modalidad") == 22
+    #                       cantidad_valores(diccionario, "nivel") == 22
 
     return len(diccionario[clave])
 
 
 def tipos_valores(diccionario:dict, clave:str) -> list:
-    '''Toma una clave del diccionario y genera una lista con los diferentes tipos de elementos posee la lista que 
-    representa su valor.
-    ejemplo:diccionario = {"colores": ["rojo", "azul", "rojo", "verde", "azul"]}
-    tipos_valores(diccionario, "colores") == ["rojo", "azul", "verde"]'''
+    #Toma una clave del diccionario y genera una lista con los diferentes tipos de elementos posee la lista que 
+    #representa su valor.
+    #EJ: diccionario1 = {"colores": ["rojo", "azul", "rojo", "verde", "azul"]}
+    #    tipos_valores(diccionario, "colores") == ["rojo", "azul", "verde"]
     tipos_valores=[]
     for i in diccionario[clave]:
         if i not in tipos_valores:
             tipos_valores.append(i)
     return tipos_valores
 
-
-
-def niveles_modalidad(diccionario:dict, nivel: str, modalidad:str) -> list:
-    """  Filtra y devuelve una lista con el indice de los establecimientos que pertencen al nivel 
-    y modalidad introducidos.
-    ejemplos:
-    niveles_modalidad(diccionario, "Nivel Primario", "Educacion Comun") == [4,9,16,18,19,20]
-    niveles_modalidad(diccionario, "Nivel Secundario", "Educacion Comun") ==[1,6,7,13]
-    """
-    list_nivel = []
-    for i in range (0,cantidad_valores(diccionario, "nivel")):
-        if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
-            list_nivel.append(i)
-    return list_nivel
-
-
-def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) -> int:
-   """ Calcula el total de alumnos de un sexo específico de una lista de establecimientos".
-
-    suma([['Escuela     ]], ) = 10
-    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
-    suma([], ) = 0
-   """
-   
-   suma=0
-   for i in ind_establecimiento:
-        if diccionario[sexo][i] != "":
-            suma=suma+int(diccionario[sexo][i])
-   return suma
-
-
-
-def agregar_datos(diccionario: dict, nivel: str, modalidad: str,niveles: list, sexo: dict):
-    '''esta funcion agrega los niveles donde los chicos (varones y nenas) son distinto de 0, a la lista niveles
-    donde se guardan los nombres que aparecen en el eje x...por otra parte calcula los chicos y chicas por nivel y 
-    modalidad para guardar en el diccionario sexo que despues se usa en el grafico '''
-
-    indices = niveles_modalidad(diccionario, nivel, modalidad)
-
-    cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
-    cantidad_mujeres = suma_matricula_sexo(diccionario, indices, "mujeres")
-
-    if cantidad_varones != 0 or cantidad_mujeres != 0:
-        niveles.append(f"{nivel}\n{modalidad}")
-        sexo["Varones"].append(cantidad_varones)
-        sexo["Mujeres"].append(cantidad_mujeres)
-
-
-
+#--------------------------------------------------------
 #Información y ubicación de la escuela número X.
+#--------------------------------------------------------
+
 def ingreso_establecimiento_id(diccionario:dict)-> str:
-    '''Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
-    información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".'''
+    #Toma un diccionario y le pide al usuario que ingrese el id del establecimiento del cual desea obtener más 
+    #información. Devuelve un str numérico que corresponde al id si el id ingresado existe, sino devuelve "".
     id=st.text_input("Por favor, ingrese el id del establecimiento: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder="Ingrese el id del establecimiento.", disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
@@ -157,35 +108,33 @@ def ingreso_establecimiento_id(diccionario:dict)-> str:
     else:
         return ""
             
-def x_escuela(diccionario: dict, credencial="" ) -> dict:
-    '''Toma un diccionario y el id del establecimiento eductivo (str) y devuelve un diccionario con los datos
-    mas relevantes del establecimiento.
-    EJEMPLO:diccionario = {
-    "establecimiento_id": ["100", "200", "300"],
-    "establecimiento_nombre": ["Escuela Belgrano", "Escuela San Martín", "Jardín Sol"],
-    "nivel": ["Nivel Primario", "Nivel Secundario", "Nivel Inicial"],
-    "modalidad": ["Común", "Técnica", "Común"],
-    "direccion": ["Calle A", "Calle B", "Calle C"],
-    "municipio_nombre": ["Rosario", "San Lorenzo", "Funes"],
-    "email": ["a@gmail.com", "b@gmail.com", "c@gmail.com"],
-    "telefono": ["1111", "2222", "3333"],
-    "sector": ["Estatal", "Privado", "Estatal"],
-    "latitud": ["-32.9", "-32.8", "-32.7"],
-    "longitud": ["-60.7", "-60.6", "-60.5"]}
+def datos_tabla_escuela(diccionario: dict, credencial="" ) -> dict:
+    #Toma un diccionario y el id del establecimiento eductivo (str) y devuelve un diccionario con los datos
+    #mas relevantes del establecimiento.
+    #EJ:diccionario1 = {
+    #                "establecimiento_id": ["100", "200", "300"],
+    #                "establecimiento_nombre": ["Escuela Belgrano", "Escuela San Martín", "Jardín Sol"],
+    #                "nivel": ["Nivel Primario", "Nivel Secundario", "Nivel Inicial"],
+    #                "modalidad": ["Común", "Técnica", "Común"],
+    #                "direccion": ["Calle A", "Calle B", "Calle C"],
+    #                "municipio_nombre": ["Rosario", "San Lorenzo", "Funes"],
+    #                "email": ["a@gmail.com", "b@gmail.com", "c@gmail.com"],
+    #                "telefono": ["1111", "2222", "3333"],
+    #                "sector": ["Estatal", "Privado", "Estatal"],
+    #                "latitud": ["-32.9", "-32.8", "-32.7"],
+    #                "longitud": ["-60.7", "-60.6", "-60.5"]}
 
-    x_escuela(diccionario, "100") == 
-    {
-    "establecimiento_nombre": "Escuela Belgrano",
-    "nivel": "Nivel Primario",
-    "modalidad": "Común",
-    "direccion": "Calle A",
-    "municipio": "Rosario",
-    "correo": "a@gmail.com",
-    "telefono": "1111",
-    "sector": "Estatal",
-    "latitud": "-32.9",
-    "longitud": "-60.7"
-    }'''
+    #datos_tabla_escuela(diccionario1, "100") == {"establecimiento_nombre": "Escuela Belgrano",
+    #                                               "nivel": "Nivel Primario",
+    #                                               "modalidad": "Común",
+    #                                               "direccion": "Calle A",
+    #                                               "municipio": "Rosario",
+    #                                               "correo": "a@gmail.com",
+    #                                               "telefono": "1111",
+    #                                               "sector": "Estatal",
+    #                                               "latitud": "-32.9",
+    #                                               "longitud": "-60.7"}
+
     if credencial != "":
         for i in range(cantidad_valores(diccionario, "establecimiento_id")):
             if diccionario["establecimiento_id"][i] == credencial:
@@ -204,17 +153,17 @@ def x_escuela(diccionario: dict, credencial="" ) -> dict:
         return {}
     return None
 
-def tabla(diccionario_tabla: dict, credencial=""):
-    '''Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
-    #con los datos más relevantes del establecimiento.'''
+def tabla_escuela(diccionario_tabla: dict, credencial=""):
+    #Toma un diccionario y el id del establecimiento educativo (str) y si es distinto de "", muestra una tabla
+    #con los datos más relevantes del establecimiento.
     if credencial != "":
         return st.table(data=diccionario_tabla, border=True, width="stretch", height="content", 
                         hide_index=None, hide_header=None)
     return None
 
-def mapa(diccionario_tabla:dict,credencial=""):
-    '''Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
-    coordenada donde se halla el establcimiento.'''
+def mapa_escuela(diccionario_tabla:dict,credencial=""):
+    #Toma un diccionario y el id del establecimiento eductivo (str) e imprime un mapa con un punto en la 
+    #coordenada donde se halla el establcimiento.
     if credencial != "":
         lat=diccionario_tabla["latitud"]
         long=diccionario_tabla["longitud"]
@@ -222,14 +171,16 @@ def mapa(diccionario_tabla:dict,credencial=""):
            color=None, size=None, zoom=None, width="stretch", height=500, use_container_width=None)
     return None
 
+#----------------------------------------------------------------------------------------------------
+#¿Cuántas escuelas hay en la provincia de Buenos Aires dependiendo su nivel y cuál es su localización?
+#----------------------------------------------------------------------------------------------------
 
-#¿Cuántas escuelas hay en la provincia de Buenos Aires dependiendo su nivel?
 def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
-    '''esta funcion toma un diccionario y devuelve la cantidad de escuelas que hay 
-    dependiendo el nivel
-    cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
-    cantidad_escuelas_nivel([], "Nivel Secundario") == 0
-    cantidad_escuelas_nivel(diccionario, "Formacion Intregal") == 1'''
+    #Toma un diccionario y devuelve la cantidad de escuelas que hay dependiendo el nivel educativo.
+    #EJ con archivo de prueba:
+    #cantidad_escuelas_nivel(diccionario, "Nivel Secundario") == 7
+    #cantidad_escuelas_nivel([], "Nivel Secundario") == 0
+    #cantidad_escuelas_nivel(diccionario, "Formacion Intregal") == 1'''
     cantidad = 0
     for niv in diccionario["nivel"]:
         if niv == nivel:
@@ -237,8 +188,11 @@ def cantidad_escuelas_nivel(diccionario:dict, nivel:str)-> int:
         
     return cantidad
 
+
 def selector_niveles(diccionario:dict):
-    '''crea un selector de cajas con los niveles posibles y devuelve la cantidad de escuelas de ese nivel'''
+# Genera un selector de cajas con los niveles educativos posibles y devuelve la cantidad de escuelas de ese nivel,
+# una vez seleccionado el nivel, imprime un texto donde se datalla la cantidad de escuelas que existen en la provincia
+# de Buenos Aires con tal nivel.
     nivel = st.selectbox("Por favor, seleccione un nivel educativo:",
                           tipos_valores(diccionario, "nivel"),
                           index = None,
@@ -249,8 +203,9 @@ def selector_niveles(diccionario:dict):
 
         mapa_nivel(diccionario, nivel)
 
+
 def mapa_nivel(diccionario: dict, nivel: str):
-    '''Muestra en un mapa todas las escuelas del nivel seleccionado.'''
+# Muestra en un mapa todas las escuelas del nivel educativo introducido.
 
     latitudes = []
     longitudes = []
@@ -263,26 +218,18 @@ def mapa_nivel(diccionario: dict, nivel: str):
             latitudes.append(float(diccionario["latitud"][i]))
             longitudes.append(float(diccionario["longitud"][i]))
 
-    if len(latitudes) > 0:
-        st.map(
-            data={
-                "lat": latitudes,
-                "lon": longitudes
-            },
-            height=500
-        )
-    else:
-        st.write("No hay escuelas para mostrar.")
+    st.map(data={"lat": latitudes,"lon": longitudes}, height=500)
 
 
-#¿Cuál es el nombre, dirección e e-mail de las
-#instituciones educativas que se encuentran en Y municipio de la provincia de Buenos Aires, de X nivel?
+#--------------------------------------------------------------------------------------------------
+#¿Cuál es el nombre, dirección e e-mail de las instituciones educativas que se encuentran en Y municipio de la
+# provincia de Buenos Aires, de X nivel educativo?
+#-----------------------------------------------------------------------------------------------------
 
 def ingreso_municipio_nombre(diccionario:dict)-> str:
-    '''Toma un diccionario y le pide al usuario que ingrese el nombre del municipio del cual desea obtener más 
-    información. Devuelve un str que corresponde al municipio, si el municipio no existe, sino devuelve "".'''
-    introduccion="Establecimientos por localidad y nivel educativo: "
-    st.header(introduccion, anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+#Toma un diccionario y le pide al usuario que ingrese el nombre del municipio del cual desea obtener más 
+#información. Devuelve un str que corresponde al municipio, si el municipio no existe, sino devuelve "".
+    
     municipio=st.text_input("Por favor, ingrese el nombre del municipio: ", value="", max_chars=None, key=None, type="default", help=None, autocomplete=None, 
                     on_change=None, args=None, kwargs=None, placeholder="Ingrese el nombre del municipio", disabled=False, 
                     label_visibility="visible", icon=None, width="stretch", bind=None)
@@ -291,20 +238,19 @@ def ingreso_municipio_nombre(diccionario:dict)-> str:
         if municipio.lower() == diccionario["municipio_nombre"][i].lower():
             return municipio
         i += 1
-
     return ""
 
 def ingreso_nivel(diccionario:dict)->str:
-    '''Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
-    información. Devuelve un str que corresponde al nivel.'''
-    nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=None, key=None, help=None, on_change=None,
-     args=None, kwargs=None, disabled=False, horizontal=False, captions=None, label_visibility="visible", 
-     width="content", bind=None)
+# Toma un diccionario y le pide al usuario que seleccione el nivel del establecimiento del cual desea obtener más 
+# información. Devuelve un str que corresponde al nivel.
+    nivel=st.radio("Seleccione un nivel educativo: ", tipos_valores(diccionario, "nivel"), index=None, key=None, help=None, 
+    on_change=None, args=None, kwargs=None, disabled=False, horizontal=False, captions=None, label_visibility="visible", 
+    width="content", bind=None)
     return nivel
     
 def indices_tabla_establecimientos(diccionario:dict,municipio:str,nivel:str)->list:
-    '''Toma un diccionario, el str del municipio y el str del nivel y devuelve la posicion de las listas de los 
-    establecimientos que cumplen ambas condiciones (municipio y nivel).'''
+# Toma un diccionario, el str del municipio y el str del nivel y devuelve una lista de indices de los establecimientos 
+# que cumplen ambas condiciones (municipio y nivel).'''
     indices=[]
     for j in range (0,cantidad_valores(diccionario, "municipio_nombre")):
         if municipio.lower() == diccionario["municipio_nombre"][j].lower() and nivel == diccionario["nivel"][j]:
@@ -349,24 +295,41 @@ def ingreso_municipio_selector(diccionario:dict):
     return municipio
 
 def calculo_suma(sizes:list)->float:
+    #Recibe una lista de float y devuelve la suma de los valores.
+    #EJ: [1.1, 5.2, 3.3] -> 9.6
+    #    [0] -> 0
+    #    [8, 6, 1.3] -> 15.3
     cantidad=0
     for valor in sizes:
         cantidad+=valor
     return cantidad
 
 def calculo_porcentaje(sizes:list)->list:
+    #Recibe una lista de float y devuelve una lista de float con los porcentajes de los valores iniciales, redondeados
+    #a 1 decimal.
+    #EJ: [1.1, 5.2, 3.3] -> [11.5, 54.2, 34.4]
+    #    [0] -> "Error, no se puede dividir por 0"
+    #    [8, 6, 1.3] -> [52.3, 39.2, 8,5]
     lista_porcentaje=[]
     total=calculo_suma(sizes)
-    for valor in sizes:
-        porcentaje_float=(valor/total)*100
-        porcentaje=round(porcentaje_float,1)
-        lista_porcentaje.append(porcentaje)
-    return lista_porcentaje
+    if total != 0:
+        for valor in sizes:
+            porcentaje_float=(valor/total)*100
+            porcentaje=round(porcentaje_float,1)
+            lista_porcentaje.append(porcentaje)
+        return lista_porcentaje
+    else: 
+        print("Error, no se puede dividir por 0")
 
 def union_listas(lista1:list, lista2:list)->list:
+    #Recibe una lista1 de str y una lista2 de float con porcentajes y devuelve una lista de str donde se detalla
+    #una leyenda/nivel con su porcentaje asociado
+    # EJ: [harina, azucar, huevo], [38, 52, 10] -> [harina (38%), azucar (52%), huevo (10%)]
+    #     [inicial, primario, secundario], [51, 25, 24] -> [inicial (51%), primario (25%), secundario (24%)]
+    #     [], [] -> []
     lista_total=[]
     for indice in range (0, len(lista1)):
-        lista_total.append(lista2[indice]+" ("+str(lista1[indice])+"%)")
+        lista_total.append(lista1[indice]+" ("+str(lista2[indice])+"%)")
     return lista_total
 
 def grafico_torta_municipio(diccionario: dict):
@@ -391,7 +354,7 @@ def grafico_torta_municipio(diccionario: dict):
                     center=(0, 0), frame=False, rotatelabels=False, normalize=True, hatch=None, data=None)
 
     lista_porcentaje=calculo_porcentaje(sizes)
-    leyenda=union_listas(lista_porcentaje, labels)
+    leyenda=union_listas(labels, lista_porcentaje)
 
     ax.legend(grafico_tortas.wedges, leyenda,
           title="Niveles Educativos",
@@ -403,26 +366,75 @@ def grafico_torta_municipio(diccionario: dict):
 
 #¿Cuántos varones y mujeres hay en las escuelas de nivel inicial,
 # secundario y primario de la provincia de Buenos Aires, separadas por modalidad de la escuela?
-def grafico(diccionario: dict):
-    '''esta funcion toma el diccionario general y utilizando la funcion anterior, toma valores
-    necesarios para hacer el grafico'''
-    niveles = []
-    sexo = {"Varones": [], "Mujeres": []}
 
-    for nivel in ["Nivel Secundario", "Nivel Primario", "Nivel Inicial"]:
-        for modalidad in tipos_valores(diccionario, "modalidad"):
-            agregar_datos(diccionario, nivel, modalidad, niveles, sexo)
+def lista_indices_modalidad(diccionario:dict, nivel:str, modalidad:str) -> list:
+    """  Filtra y devuelve una lista con el indice de los establecimientos que pertencen al nivel 
+    y modalidad introducidos.
+    ejemplos:
+    niveles_modalidad(diccionario, "Nivel Primario", "Educacion Comun") == [4,9,16,18,19,20]
+    niveles_modalidad(diccionario, "Nivel Secundario", "Educacion Comun") ==[1,6,7,13]
+    """
+    list_nivel = []
+    for i in range (0,cantidad_valores(diccionario, "nivel")):
+        if diccionario["nivel"][i] == nivel and diccionario["modalidad"][i] == modalidad:
+            list_nivel.append(i)
+    return list_nivel
 
 
-#PARTE DEL MATPLOT
+def suma_matricula_sexo(diccionario:dict, ind_establecimiento: list, sexo: str) -> int:
+   """ Calcula el total de alumnos de un sexo específico de una lista de establecimientos".
+
+    suma([['Escuela     ]], ) = 10
+    suma([['Escuela' ], ['Escuela' ,  ]],  ) = 
+    suma([], ) = 0
+   """
+   
+   suma=0
+   for i in ind_establecimiento:
+        if diccionario[sexo][i] != "":
+            suma=suma+int(diccionario[sexo][i])
+   return suma
+
+
+def datos_grafico_barras(diccionario: dict, nivel: str) -> tuple:
+#    Prepara el iterable (diccionario) con los datos estructurados para el gráfico.
+#   Devuelve también la lista de modalidades para usar en el eje X.
+
+    modalidades = tipos_valores(diccionario, "modalidad")
+    
+    lista_varones = []
+    lista_mujeres = []
+    modalidades_grafico = []
+    
+    for modalidad in modalidades:
+        indices = lista_indices_modalidad(diccionario, nivel, modalidad)
+        cantidad_varones = suma_matricula_sexo(diccionario, indices, "varones")
+        cantidad_mujeres = suma_matricula_sexo(diccionario, indices, "mujeres")
+        
+        if cantidad_varones > 0 or cantidad_mujeres > 0:
+            lista_varones.append(cantidad_varones)
+            lista_mujeres.append(cantidad_mujeres)
+            modalidades_grafico.append(modalidad)
+            
+    datos_grafico = {f"Varones - {nivel}": lista_varones,
+                     f"Mujeres - {nivel}": lista_mujeres}
+    
+    return datos_grafico, modalidades_grafico
+
+
+def grafico_barras(diccionario: dict, nivel: str, color:str):
+ #   Toma el diccionario y el nivel educativo, y dibuja el gráfico de barras.
+
+    datos_grafico, modalidades = datos_grafico_barras(diccionario, nivel)
+
     fig, ax = plt.subplots(figsize=(18, 10), layout="constrained")
-    ax.set_xticklabels(niveles, rotation=90,fontsize=15)
-    res = ax.grouped_bar(sexo, tick_labels=niveles, group_spacing=1,colors=["navy","skyblue"])
+    ax.set_xticklabels(modalidades, rotation=25,fontsize=20)
+    res = ax.grouped_bar(datos_grafico, tick_labels=modalidades, group_spacing=1,colors=color)
     for container in res.bar_containers:
-        ax.bar_label(container, padding=3,fontsize=15)
+        ax.bar_label(container, padding=3,fontsize=20)
 
-    ax.set_ylabel('Cantidad de Estudiantes',fontsize=20)
-    ax.legend(loc='upper left', ncols=2,fontsize=20)
+    ax.set_ylabel('Cantidad de Estudiantes',fontsize=25)
+    ax.legend(loc='upper right', ncols=2,fontsize=25)
     ax.set_ylim(0, 500000)
 
     st.pyplot(fig)
@@ -498,14 +510,16 @@ def main():
                           expanded=True, key=None, icon=None, type="default", width="stretch", on_change="ignore", 
                         args=None, kwargs=None)     
         with pregunta1:
-            diccionario_tabla=x_escuela(diccionario, credencial)
-            tabla(diccionario_tabla, credencial)
+            diccionario_tabla=datos_tabla_escuela(diccionario, credencial)
+            tabla_escuela(diccionario_tabla, credencial)
     with col2:
-        mapa(diccionario_tabla,credencial)
+        mapa_escuela(diccionario_tabla,credencial)
 
-    st.header("Cantidad de escuelas por Nivel Educativo.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    st.header("Cantidad de establecimientos por Nivel Educativo.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
     selector_niveles(diccionario)
 
+    introduccion="Establecimientos por Localidad y Nivel Educativo: "
+    st.header(introduccion, anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
     municipio=ingreso_municipio_nombre(diccionario)
     nivel=ingreso_nivel(diccionario)
     pregunta2=st.expander("Seleccione para ver más.",
@@ -514,17 +528,19 @@ def main():
     with pregunta2:
         if municipio!="" and nivel!="":
             tabla_establecimientos(diccionario,municipio,nivel)  
-    
-    
-        
-    col3, col4 = st.columns(2,gap="medium", vertical_alignment="top", border=False, width="stretch")
+
+    st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles educativos de las instituciones?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    grafico_torta_municipio(diccionario)
+     
+    st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
+    col3, col4 = st.columns(2,gap="medium", vertical_alignment="center", border=False, width="stretch")
     with col3:
-        st.header("¿En el municipio seleccionado, como están distribuidas porcentualmente los distintos niveles educativos de las instituciones?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
-        grafico_torta_municipio(diccionario)
+        grafico_barras(diccionario, "Nivel Inicial",["orange","moccasin"])
+        grafico_barras(diccionario, "Nivel Primario",["green","limegreen"])
     with col4:
-        st.header("¿Cuántos varones y mujeres hay en las escuelas de nivel inicial, secundario y primario, de la provincia de Buenos Aires, separadas por modalidad de la escuela?", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
-        grafico(diccionario)
-        
+        grafico_barras(diccionario, "Nivel Secundario",["purple","orchid"])
+
+
         
     st.header("Información sobre Escuelas Rurales.", anchor=None, help=None, divider=False, width="stretch", text_alignment="center")
     pregunta3=st.expander("Seleccione para ver más.",
